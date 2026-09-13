@@ -1,656 +1,589 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinnacle Global School — Syllabus Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syllabus Generator - Pinnacle Global School</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons for Subjects -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- html2pdf Library for Direct Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0b1e47;
+            --accent-gold: #e5a720;
+            --light-bg: #f8fafd;
+            --border-blue: #1c356e;
+            --text-dark: #1a1a1a;
+        }
 
-  <style>
-    :root{
-      --navy:#062a63;
-      --navy2:#0b3b82;
-      --gold:#e7ad35;
-      --gold2:#f4cf6a;
-      --orange:#e46b24;
-      --ink:#17233d;
-      --muted:#667085;
-      --paper:#ffffff;
-      --bg:#eef3f9;
-      --line:#d9e2ef;
-      --shadow:0 18px 55px rgba(9,38,82,.13);
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;
-      background:linear-gradient(135deg,#edf3fa 0%,#f8fafc 55%,#eaf1f9 100%);
-      color:var(--ink);
-      font-family:"DM Sans","Noto Sans Devanagari",sans-serif;
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #eef2f5;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
 
-    .app{min-height:100vh}
-    .topbar{
-      position:sticky; top:0; z-index:20;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid rgba(6,42,99,.10);
-    }
-    .topbar-inner{
-      max-width:1280px; margin:auto; padding:13px 22px;
-      display:flex; align-items:center; gap:18px;
-    }
-    .brand-mini{display:flex;align-items:center;gap:12px;min-width:245px}
-    .brand-mini img{width:52px;height:52px;object-fit:contain}
-    .brand-mini strong{display:block;color:var(--navy);font-size:16px;letter-spacing:.2px}
-    .brand-mini span{display:block;color:#7a879a;font-size:11px;margin-top:2px}
-    .top-actions{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap}
-    button{
-      border:0; cursor:pointer; font:inherit;
-      border-radius:11px; padding:10px 14px;
-      transition:.18s ease; font-weight:700;
-    }
-    button:hover{transform:translateY(-1px)}
-    .btn-light{background:#eef3f9;color:var(--navy)}
-    .btn-primary{background:var(--navy);color:#fff;box-shadow:0 8px 20px rgba(6,42,99,.18)}
-    .btn-gold{background:linear-gradient(135deg,var(--gold),#f2c85b);color:#152544}
-    .btn-danger{background:#fff0ee;color:#a93524}
+        /* Controls Area (Screen Only) */
+        .controls-container {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 800px;
+        }
 
-    .hero{
-      max-width:1280px; margin:28px auto 18px; padding:0 22px;
-    }
-    .hero-card{
-      overflow:hidden; position:relative;
-      background:
-        radial-gradient(circle at 92% 10%,rgba(231,173,53,.28),transparent 22%),
-        radial-gradient(circle at 5% 90%,rgba(30,109,195,.16),transparent 26%),
-        linear-gradient(120deg,#06265a,#0b3c83 55%,#092c66);
-      border-radius:25px; color:white; box-shadow:var(--shadow);
-      padding:30px 34px;
-    }
-    .hero-card:after{
-      content:""; position:absolute; inset:auto -60px -85px auto;
-      width:240px;height:240px;border:2px solid rgba(244,207,106,.28);
-      border-radius:50%;
-    }
-    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center}
-    .eyebrow{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:7px 11px;border:1px solid rgba(255,255,255,.24);
-      background:rgba(255,255,255,.08);border-radius:999px;
-      font-size:12px;letter-spacing:.8px;text-transform:uppercase;
-    }
-    h1{font-family:"Libre Baskerville",serif;font-size:clamp(30px,4vw,49px);line-height:1.08;margin:14px 0 9px}
-    .hero p{margin:0;color:#dce7f7;max-width:700px;font-size:15px;line-height:1.65}
-    .meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-    .meta-pill{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);padding:9px 12px;border-radius:10px;font-size:13px}
-    .hero-logo{display:flex;justify-content:flex-end}
-    .hero-logo img{width:min(245px,70%);filter:drop-shadow(0 14px 25px rgba(0,0,0,.22))}
+        .controls-container label {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
 
-    .controls{
-      max-width:1280px;margin:0 auto;padding:0 22px 18px;
-      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-    }
-    .selector{
-      background:#fff;border:1px solid var(--line);border-radius:13px;
-      padding:12px 14px;min-width:220px;color:var(--navy);
-      font:600 14px "DM Sans","Noto Sans Devanagari",sans-serif;
-      outline:none;
-    }
-    .status{margin-left:auto;color:var(--muted);font-size:12px}
+        .controls-container select {
+            padding: 8px 16px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
 
-    .classes{
-      max-width:1280px;margin:0 auto;padding:0 22px 45px;
-      display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
-    }
-    .class-card{
-      background:#fff;border:1px solid var(--line);border-radius:17px;
-      padding:17px;box-shadow:0 7px 22px rgba(10,38,75,.05);
-      cursor:pointer;position:relative;overflow:hidden;
-    }
-    .class-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
-    .class-card.active{border-color:#7da2d5;box-shadow:0 12px 30px rgba(6,42,99,.12);transform:translateY(-2px)}
-    .class-card small{color:#7b8798;font-size:11px}
-    .class-card strong{display:block;font-size:21px;color:var(--navy);margin-top:4px}
-    .class-card span{font-size:12px;color:#667085}
+        .btn-action {
+            background-color: var(--primary-blue);
+            color: #fff;
+            padding: 10px 20px;
+            border: 2px solid var(--accent-gold);
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .preview-wrap{max-width:1280px;margin:0 auto 60px;padding:0 22px}
-    .preview-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px}
-    .preview-head h2{margin:0;color:var(--navy);font-size:23px}
-    .preview-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
-    .paper-shell{background:#dfe7f1;border-radius:22px;padding:22px;box-shadow:inset 0 0 0 1px #d0d9e5}
+        .btn-action:hover {
+            background-color: var(--accent-gold);
+            color: var(--primary-blue);
+        }
 
-    /* The actual printable page */
-    .syllabus-page{
-      width:210mm; min-height:297mm; margin:0 auto; background:#fff;
-      position:relative; overflow:hidden; color:#17233d;
-      box-shadow:0 12px 40px rgba(7,35,74,.13);
-      padding:13mm 12mm 15mm;
-      font-family:"DM Sans","Noto Sans Devanagari",sans-serif;
-    }
-    .page-frame{
-      position:absolute;inset:5mm;border:1px solid #e2e8f0;border-radius:5mm;pointer-events:none;
-    }
-    .page-topline{height:4px;background:linear-gradient(90deg,var(--navy),var(--gold),var(--orange));border-radius:5px;margin-bottom:9mm}
-    .school-head{display:grid;grid-template-columns:24mm 1fr 24mm;align-items:center;gap:5mm}
-    .school-logo{width:23mm;height:23mm;object-fit:contain}
-    .school-center{text-align:center}
-    .school-center .school-name{
-      font-family:"Libre Baskerville",serif;font-size:20px;color:var(--navy);
-      letter-spacing:.2px;line-height:1.2;
-    }
-    .school-center .tagline{font-size:8px;letter-spacing:2px;color:#7d8795;margin-top:3px;text-transform:uppercase}
-    .exam-title{
-      margin-top:7mm;text-align:center;font-size:22px;font-weight:800;
-      color:var(--navy);letter-spacing:1.3px;text-transform:uppercase;
-    }
-    .gold-rule{width:70mm;height:1.5px;background:var(--gold);margin:2.3mm auto 4mm}
-    .info-strip{
-      display:grid;grid-template-columns:1fr 1fr 1fr;
-      border:1px solid #e2e8f0;border-radius:3mm;overflow:hidden;margin-bottom:5mm;
-      background:#f8fafc;
-    }
-    .info-box{padding:3mm 4mm;text-align:center;border-right:1px solid #e2e8f0}
-    .info-box:last-child{border-right:0}
-    .info-label{font-size:7px;color:#7b8798;text-transform:uppercase;letter-spacing:1px}
-    .info-value{font-size:11px;font-weight:800;color:var(--navy);margin-top:1mm}
-    .table-title{
-      display:flex;align-items:center;justify-content:space-between;
-      margin:0 0 2.5mm;color:#253b5e;font-size:10px;font-weight:800;
-      text-transform:uppercase;letter-spacing:1px;
-    }
-    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #dce5ef;border-radius:3mm;overflow:hidden}
-    thead th{
-      background:linear-gradient(135deg,#062a63,#0b438f);color:#fff;
-      padding:3.1mm 3.4mm;font-size:9px;text-align:left;
-      letter-spacing:.6px;text-transform:uppercase;
-    }
-    thead th:first-child{width:29%}
-    tbody td{
-      padding:3mm 3.4mm;border-top:1px solid #e1e7ef;
-      vertical-align:top;font-size:9px;line-height:1.5;
-      white-space:pre-wrap;overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-    tbody tr:nth-child(even) td{background:#f8fbfe}
-    tbody td:first-child{font-weight:800;color:#17375f}
-    .subject-cell{display:flex;align-items:flex-start;gap:2.5mm}
-    .subject-dot{
-      flex:0 0 6mm;height:6mm;border-radius:50%;
-      background:#eaf1fb;color:var(--navy);display:flex;align-items:center;justify-content:center;
-      font-size:8px;font-weight:800;
-    }
-    .empty-note{text-align:center;padding:16mm 4mm;color:#8a95a6;font-size:10px}
-    .page-footer{
-      position:absolute;left:12mm;right:12mm;bottom:7mm;
-      border-top:1px solid #e4e9ef;padding-top:3mm;
-      display:flex;justify-content:space-between;gap:8mm;
-      color:#7b8798;font-size:7.5px;
-    }
-    .page-footer strong{color:var(--navy)}
-    .page-number{font-weight:700;color:#7a5a10}
+        /* Printable Syllabus Sheet Container */
+        .syllabus-card {
+            width: 210mm; /* A4 Width */
+            min-height: 297mm; /* A4 Height */
+            background: #ffffff;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            border: 12px solid #ffffff;
+            outline: 2px solid var(--accent-gold);
+        }
 
-    .loading{
-      min-height:300px;display:flex;align-items:center;justify-content:center;
-      flex-direction:column;gap:12px;color:#667085;background:#fff;border-radius:15px;
-    }
-    .spinner{width:28px;height:28px;border:3px solid #d9e2ef;border-top-color:var(--navy);border-radius:50%;animation:spin 1s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .error{
-      background:#fff4f2;border:1px solid #ffd1ca;color:#8d3125;border-radius:14px;padding:18px;
-      line-height:1.6;font-size:13px;
-    }
+        /* Decorative Corner Elements */
+        .syllabus-card::before {
+            content: "";
+            position: absolute;
+            top: 0; right: 0;
+            width: 150px; height: 150px;
+            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
+            opacity: 0.15;
+            pointer-events: none;
+        }
 
-    .help{
-      max-width:1280px;margin:0 auto 45px;padding:0 22px;
-    }
-    details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 17px}
-    summary{cursor:pointer;font-weight:800;color:var(--navy)}
-    details p{font-size:13px;color:#5e6b7d;line-height:1.65}
-    code{background:#eef3f9;padding:2px 5px;border-radius:5px}
+        /* Header Layout */
+        .header {
+            display: grid;
+            grid-template-columns: 120px 1fr 120px;
+            align-items: center;
+            text-align: center;
+            border-bottom: 3px double var(--accent-gold);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
 
-    @media(max-width:900px){
-      .hero-grid{grid-template-columns:1fr}.hero-logo{justify-content:flex-start}
-      .hero-logo img{width:140px}
-      .classes{grid-template-columns:repeat(2,1fr)}
-      .status{width:100%;margin-left:0}
-    }
-    @media(max-width:600px){
-      .topbar-inner{padding:10px 13px}.brand-mini{min-width:0}.brand-mini img{width:43px;height:43px}
-      .brand-mini span{display:none}.top-actions button{padding:9px 10px;font-size:12px}
-      .hero,.controls,.classes,.preview-wrap,.help{padding-left:13px;padding-right:13px}
-      .hero-card{padding:24px 20px;border-radius:18px}
-      .classes{grid-template-columns:1fr 1fr;gap:10px}
-      .class-card{padding:13px}.class-card strong{font-size:17px}
-      .paper-shell{padding:8px;overflow:auto}
-      .syllabus-page{transform-origin:top left}
-    }
+        .header img.logo {
+            width: 110px;
+            height: auto;
+            object-fit: contain;
+        }
 
-    @media print{
-      @page{size:A4 portrait;margin:0}
-      body{background:#fff}
-      .topbar,.hero,.controls,.classes,.preview-head,.help{display:none!important}
-      .preview-wrap{padding:0;margin:0}
-      .paper-shell{padding:0;background:#fff;box-shadow:none}
-      .syllabus-page{box-shadow:none;margin:0}
-    }
-  </style>
+        .header-title-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .exam-badge {
+            background: var(--primary-blue);
+            color: #ffffff;
+            padding: 4px 20px;
+            border-radius: 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+            border: 1px solid var(--accent-gold);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .school-name {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary-blue);
+            line-height: 1.1;
+            letter-spacing: 1px;
+        }
+
+        .motto {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #666;
+            margin-top: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .session-badge {
+            background: var(--accent-gold);
+            color: var(--primary-blue);
+            padding: 2px 14px;
+            font-weight: 700;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        /* Class Title Pill */
+        .class-pill-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .class-pill {
+            display: inline-block;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            font-size: 20px;
+            font-weight: 800;
+            padding: 4px 35px;
+            border-radius: 30px;
+            background: #f4f7fc;
+            letter-spacing: 1px;
+        }
+
+        /* Main Table Layout */
+        .syllabus-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: auto;
+        }
+
+        .syllabus-table th {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            font-size: 15px;
+            letter-spacing: 1px;
+            padding: 10px 15px;
+            text-transform: uppercase;
+            border: 1px solid var(--border-blue);
+        }
+
+        .syllabus-table th:first-child {
+            width: 32%;
+            text-align: left;
+            border-top-left-radius: 8px;
+        }
+
+        .syllabus-table th:last-child {
+            width: 68%;
+            text-align: left;
+            border-top-right-radius: 8px;
+        }
+
+        .syllabus-table td {
+            padding: 10px 15px;
+            border: 1px solid #dcdcdc;
+            vertical-align: middle;
+            font-size: 13.5px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            white-space: pre-wrap; /* Preserves multi-line entry & text wrapping */
+        }
+
+        .subject-cell {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            min-height: 48px;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .subject-icon {
+            width: 30px;
+            height: 30px;
+            background: #ffffff;
+            color: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .syllabus-table tr:nth-child(even) td:last-child {
+            background-color: #f9fbfd;
+        }
+
+        .syllabus-table tr:nth-child(odd) td:last-child {
+            background-color: #ffffff;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 2px solid var(--accent-gold);
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .footer-tagline {
+            font-family: 'Cinzel', serif;
+            font-style: italic;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 13px;
+        }
+
+        .footer-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .controls-container {
+                display: none;
+            }
+            .syllabus-card {
+                box-shadow: none;
+                border: none;
+                outline: none;
+                width: 100%;
+                height: 100vh;
+                padding: 20mm 15mm;
+            }
+        }
+    </style>
 </head>
-
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand-mini">
-        <img src="logo.png" alt="Pinnacle Global School logo" onerror="this.style.visibility='hidden'">
+
+    <!-- User Controls -->
+    <div class="controls-container">
         <div>
-          <strong>Pinnacle Global School</strong>
-          <span>Syllabus Portal • Academic Session</span>
+            <label for="classSelect"><i class="fa-solid fa-graduation-cap"></i> Select Class: </label>
+            <select id="classSelect" onchange="renderSyllabus()">
+                <option value="">-- Select Class --</option>
+            </select>
         </div>
-      </div>
-      <div class="top-actions">
-        <button class="btn-light" onclick="loadSheet()">↻ Refresh</button>
-        <button class="btn-primary" onclick="downloadCurrent()">↓ Download PDF</button>
-        <button class="btn-gold" onclick="downloadAll()">↓ Download All</button>
-      </div>
+        <button class="btn-action" onclick="downloadPDF()">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </button>
+        <button class="btn-action" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> Print
+        </button>
     </div>
-  </header>
 
-  <section class="hero">
-    <div class="hero-card">
-      <div class="hero-grid">
+    <!-- Printable Template -->
+    <div class="syllabus-card" id="syllabusContainer">
+        
+        <!-- Top Section -->
         <div>
-          <span class="eyebrow">📚 Official Academic Syllabus</span>
-          <h1>Half Yearly Syllabus Portal</h1>
-          <p>
-            Select a class to view its complete syllabus. The portal reads directly from the
-            <strong>syllabus</strong> sheet, automatically removes empty rows, wraps long text,
-            and creates a clean A4-ready school document.
-          </p>
-          <div class="meta-row">
-            <div class="meta-pill">CBSE • Classes Nursery–XII</div>
-            <div class="meta-pill" id="heroSession">Session: —</div>
-            <div class="meta-pill" id="heroExam">Examination: —</div>
-          </div>
+            <header class="header">
+                <img src="logo.png" alt="School Logo" class="logo" onerror="this.src='https://via.placeholder.com/100?text=LOGO'">
+                <div class="header-title-box">
+                    <div class="exam-badge" id="examName">EXAMINATION</div>
+                    <h1 class="school-name">PINNACLE GLOBAL SCHOOL</h1>
+                    <div class="motto">Nurturing Minds • Shaping Futures</div>
+                    <div class="session-badge" id="academicSession">SESSION ----</div>
+                </div>
+                <div style="width: 110px;"></div> <!-- Decorative Spacer -->
+            </header>
+
+            <div class="class-pill-container">
+                <div class="class-pill" id="selectedClassLabel">CLASS - ---</div>
+            </div>
+
+            <!-- Dynamic Data Table -->
+            <table class="syllabus-table">
+                <thead>
+                    <tr>
+                        <th><i class="fa-solid fa-book-open"></i> &nbsp;Subjects</th>
+                        <th><i class="fa-solid fa-list-check"></i> &nbsp;Syllabus</th>
+                    </tr>
+                </thead>
+                <tbody id="syllabusTableBody">
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 40px; color: #888;">
+                            Loading Syllabus Data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <div class="hero-logo">
-          <img src="logo.png" alt="Pinnacle Global School">
-        </div>
-      </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-sub">Learn • Grow • Excel</div>
+            <div class="footer-tagline">Together We Achieve More</div>
+        </footer>
     </div>
-  </section>
 
-  <section class="controls">
-    <select id="classSelect" class="selector" onchange="selectClass(this.value)" aria-label="Select class"></select>
-    <button class="btn-primary" onclick="downloadCurrent()">Download Selected Class</button>
-    <button class="btn-light" onclick="window.print()">Print / Save PDF</button>
-    <div class="status" id="status">Loading syllabus…</div>
-  </section>
+    <script>
+        const SHEET_ID = '1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI';
+        const GID = '1915322612';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-  <section class="classes" id="classCards"></section>
+        let rawRows = [];
+        let parsedClassData = {};
+        let examName = "HALF YEARLY EXAMINATION";
+        let session = "2026-27";
 
-  <section class="preview-wrap">
-    <div class="preview-head">
-      <div>
-        <h2 id="previewTitle">Syllabus Preview</h2>
-        <p>What you see below is the same layout used for the downloadable PDF.</p>
-      </div>
-      <div id="rowCount" style="font-size:12px;color:#667085"></div>
-    </div>
+        // Subject Icon Mapping
+        const iconMap = {
+            'HINDI': 'fa-language',
+            'ENGLISH': 'fa-font',
+            'MATHS': 'fa-calculator',
+            'MATHEMATICS': 'fa-calculator',
+            'SCIENCE': 'fa-flask',
+            'S.ST': 'fa-landmark',
+            'SOCIAL SCIENCE': 'fa-landmark',
+            'COMPUTER': 'fa-laptop-code',
+            'COMPUTERS': 'fa-laptop-code',
+            'SANSKRIT': 'fa-book-atlas',
+            'M.V.': 'fa-heart-pulse',
+            'G.K.': 'fa-lightbulb',
+            'DRAWING': 'fa-palette',
+            'ART': 'fa-palette',
+            'PHYSICS': 'fa-atom',
+            'CHEMISTRY': 'fa-vial',
+            'BIOLOGY': 'fa-dna',
+            'ACCOUNTANCY': 'fa-file-invoice-dollar',
+            'BUSINESS': 'fa-briefcase',
+            'ECONOMICS': 'fa-chart-line'
+        };
 
-    <div class="paper-shell">
-      <div id="preview">
-        <div class="loading"><div class="spinner"></div><div>Reading syllabus from Google Sheets…</div></div>
-      </div>
-    </div>
-  </section>
+        // Fetch Google Sheet Data
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+                // Strip GViz JSON wrapper
+                const jsonString = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+                const data = JSON.parse(jsonString);
 
-  <section class="help">
-    <details>
-      <summary>Google Sheet connection & data structure</summary>
-      <p>
-        Spreadsheet ID: <code>1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI</code>.
-        The portal reads the tab named <code>syllabus</code>. Examination is read from
-        <code>B1</code> and session from <code>F1</code>. Nursery–5th uses pairs
-        <code>A:B, C:D, E:F, G:H, I:J, K:L, M:N, O:P</code>; Classes 6th–12th use
-        <code>A:B</code> through <code>M:N</code>. Only rows containing a subject or syllabus
-        are displayed.
-      </p>
-      <p>
-        <strong>Important:</strong> the Google Sheet must be accessible to the public
-        (or published to the web) for a GitHub Pages site to read it without a Google login.
-        No Google API key is required for the public <code>gviz</code> read used here.
-      </p>
-    </details>
-  </section>
-</div>
+                rawRows = data.table.rows;
+                extractMetadata();
+                parseSyllabusData();
+                populateDropdown();
+            } catch (error) {
+                console.error("Error loading spreadsheet data:", error);
+                document.getElementById('syllabusTableBody').innerHTML = `
+                    <tr><td colspan="2" style="color:red; text-align:center;">Failed to fetch syllabus data. Please ensure sheet permissions are set to public view.</td></tr>
+                `;
+            }
+        }
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-  const CONFIG = {
-    spreadsheetId: "1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI",
-    sheetName: "syllabus",
-    schoolName: "PINNACLE GLOBAL SCHOOL",
-    schoolTagline: "Where Tradition Meets Tomorrow",
-    address: "Near Chola Police Station, Bulandshahr",
-    phones: "7830968000 • 7830969000",
-    logo: "logo.png"
-  };
+        // Helper to safely get cell text
+        function getCellVal(r, c) {
+            if (rawRows[r] && rawRows[r].c && rawRows[r].c[c] && rawRows[r].c[c].v !== null) {
+                return String(rawRows[r].c[c].v).trim();
+            }
+            return "";
+        }
 
-  const CLASS_NAMES = [
-    "Nursery","LKG","UKG","1st","2nd","3rd","4th","5th",
-    "6th","7th","8th","9th","10th","11th","12th"
-  ];
+        // Metadata: Exam Name (B1 -> Row 0, Col 1), Session (F1 -> Row 0, Col 5)
+        function extractMetadata() {
+            const b1 = getCellVal(0, 1);
+            const f1 = getCellVal(0, 5);
+            if (b1) examName = b1;
+            if (f1) session = f1;
 
-  let sheetRows = [];
-  let examName = "";
-  let session = "";
-  let selectedClass = "6th";
-  let classData = {};
+            document.getElementById('examName').innerText = examName;
+            document.getElementById('academicSession').innerText = session.toUpperCase().includes("SESSION") ? session : `ACADEMIC SESSION ${session}`;
+        }
 
-  function clean(v) {
-    return String(v ?? "").replace(/\r/g,"").trim();
-  }
+        // Parse Sheet Structure
+        function parseSyllabusData() {
+            parsedClassData = {};
 
-  // Robust CSV parser: handles commas, quotes, newlines and Unicode.
-  function parseCSV(text) {
-    const rows = [];
-    let row = [], field = "", quoted = false;
-    for (let i=0; i<text.length; i++) {
-      const c = text[i];
-      if (quoted) {
-        if (c === '"') {
-          if (text[i+1] === '"') { field += '"'; i++; }
-          else quoted = false;
-        } else field += c;
-      } else {
-        if (c === '"') quoted = true;
-        else if (c === ',') { row.push(field); field = ""; }
-        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
-        else if (c !== '\r') field += c;
-      }
-    }
-    if (field.length || row.length) { row.push(field); rows.push(row); }
-    return rows;
-  }
+            // Block 1: Nursery to 5th (Rows 4 to 17 -> indices 3 to 16)
+            parseBlock(2, 3, 16); 
 
-  async function fetchCSV() {
-    const url =
-      `https://docs.google.com/spreadsheets/d/${CONFIG.spreadsheetId}/gviz/tq` +
-      `?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.sheetName)}&cachebust=${Date.now()}`;
+            // Block 2: 6th to 12th (Rows 20 to 33 -> indices 19 to 32)
+            parseBlock(18, 19, 32); 
+        }
 
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Google Sheets returned HTTP ${res.status}.`);
-    const text = await res.text();
+        function parseBlock(headerRowIdx, startRowIdx, endRowIdx) {
+            if (!rawRows[headerRowIdx]) return;
 
-    if (!text || text.startsWith("<!DOCTYPE") || text.includes("<html")) {
-      throw new Error("The sheet could not be read. Make sure it is shared/published for public viewing.");
-    }
-    return parseCSV(text);
-  }
+            const headerCells = rawRows[headerRowIdx].c || [];
+            
+            // Step across columns in pairs (Class/Subject Header, Syllabus)
+            for (let c = 0; c < headerCells.length; c += 2) {
+                let className = getCellVal(headerRowIdx, c);
+                if (!className) continue;
 
-  function getCell(rows, r, c) {
-    return clean(rows[r]?.[c]);
-  }
+                // Format Class Label
+                className = className.replace(/^CLASS[\s-:]*/i, '').trim();
 
-  function buildData(rows) {
-    const result = {};
+                if (!parsedClassData[className]) {
+                    parsedClassData[className] = [];
+                }
 
-    // Nursery to 5th: rows 4–17 in the sheet => zero-based 3–16.
-    // Pairs: A:B, C:D, ... O:P.
-    for (let pair = 0; pair < 8; pair++) {
-      const col = pair * 2;
-      const cls = getCell(rows, 1, col);
-      if (!cls) continue;
+                for (let r = startRowIdx; r <= endRowIdx; r++) {
+                    const subject = getCellVal(r, c);
+                    const syllabus = getCellVal(r, c + 1);
 
-      const entries = [];
-      for (let r = 3; r <= 16; r++) {
-        const subject = getCell(rows, r, col);
-        const syllabus = getCell(rows, r, col + 1);
-        if (subject || syllabus) entries.push({ subject, syllabus });
-      }
-      result[cls] = entries;
-    }
+                    // Skip empty rows
+                    if (subject !== "" || syllabus !== "") {
+                        parsedClassData[className].push({
+                            subject: subject,
+                            syllabus: syllabus
+                        });
+                    }
+                }
+            }
+        }
 
-    // 6th to 12th: rows 20–33 => zero-based 19–32.
-    // Pairs A:B through M:N.
-    for (let pair = 0; pair < 7; pair++) {
-      const col = pair * 2;
-      const cls = getCell(rows, 17, col);
-      if (!cls) continue;
+        // Populate Dropdown
+        function populateDropdown() {
+            const select = document.getElementById('classSelect');
+            select.innerHTML = '';
+            
+            const classes = Object.keys(parsedClassData);
+            if (classes.length === 0) {
+                select.innerHTML = '<option value="">No Classes Found</option>';
+                return;
+            }
 
-      const entries = [];
-      for (let r = 19; r <= 32; r++) {
-        const subject = getCell(rows, r, col);
-        const syllabus = getCell(rows, r, col + 1);
-        if (subject || syllabus) entries.push({ subject, syllabus });
-      }
-      result[cls] = entries;
-    }
+            classes.forEach((cls, idx) => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.innerText = `Class ${cls}`;
+                select.appendChild(opt);
+            });
 
-    return result;
-  }
+            // Default Select First Available Class
+            select.selectedIndex = 0;
+            renderSyllabus();
+        }
 
-  function initials(subject) {
-    const s = clean(subject);
-    if (!s) return "•";
-    const words = s.replace(/[^\p{L}\p{N}\s]/gu," ").split(/\s+/).filter(Boolean);
-    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
-    return s.slice(0,2).toUpperCase();
-  }
+        // Render Syllabus Table for Selected Class
+        function renderSyllabus() {
+            const selectedClass = document.getElementById('classSelect').value;
+            const tbody = document.getElementById('syllabusTableBody');
+            document.getElementById('selectedClassLabel').innerText = `CLASS - ${selectedClass.toUpperCase()}`;
 
-  function escapeHTML(s) {
-    return String(s ?? "")
-      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  }
+            tbody.innerHTML = '';
 
-  function renderPage(cls) {
-    const rows = classData[cls] || [];
+            const items = parsedClassData[selectedClass] || [];
 
-    const rowsHTML = rows.length
-      ? rows.map((item, i) => `
-          <tr>
-            <td>
-              <div class="subject-cell">
-                <span class="subject-dot">${escapeHTML(initials(item.subject))}</span>
-                <span>${escapeHTML(item.subject || "—")}</span>
-              </div>
-            </td>
-            <td>${escapeHTML(item.syllabus || "—")}</td>
-          </tr>
-        `).join("")
-      : `<tr><td colspan="2"><div class="empty-note">No syllabus entries have been entered for this class yet.</div></td></tr>`;
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">No syllabus details available for this class.</td></tr>`;
+                return;
+            }
 
-    return `
-      <div class="syllabus-page" id="printPage">
-        <div class="page-frame"></div>
-        <div class="page-topline"></div>
+            items.forEach(item => {
+                // Determine Icon
+                const cleanSub = item.subject.toUpperCase();
+                let iconClass = 'fa-book';
+                for (let key in iconMap) {
+                    if (cleanSub.includes(key)) {
+                        iconClass = iconMap[key];
+                        break;
+                    }
+                }
 
-        <div class="school-head">
-          <img class="school-logo" src="${CONFIG.logo}" alt="School logo">
-          <div class="school-center">
-            <div class="school-name">${CONFIG.schoolName}</div>
-            <div class="tagline">${CONFIG.schoolTagline}</div>
-          </div>
-          <div></div>
-        </div>
+                // Format Bullet Points/Newlines nicely
+                let formattedSyllabus = item.syllabus
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0)
+                    .map(line => line.startsWith('•') || line.startsWith('-') ? line : `• ${line}`)
+                    .join('\n');
 
-        <div class="exam-title">${escapeHTML(examName || "EXAMINATION")} • SYLLABUS</div>
-        <div class="gold-rule"></div>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="subject-cell">
+                            <div class="subject-icon"><i class="fa-solid ${iconClass}"></i></div>
+                            <span>${item.subject}</span>
+                        </div>
+                    </td>
+                    <td>${formattedSyllabus}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-        <div class="info-strip">
-          <div class="info-box">
-            <div class="info-label">Academic Session</div>
-            <div class="info-value">${escapeHTML(session || "—")}</div>
-          </div>
-          <div class="info-box">
-            <div class="info-label">Class</div>
-            <div class="info-value">${escapeHTML(cls)}</div>
-          </div>
-          <div class="info-box">
-            <div class="info-label">Total Subjects / Entries</div>
-            <div class="info-value">${rows.length}</div>
-          </div>
-        </div>
+        // Download HTML element as PDF
+        function downloadPDF() {
+            const element = document.getElementById('syllabusContainer');
+            const selectedClass = document.getElementById('classSelect').value;
+            const opt = {
+                margin:       0,
+                filename:     `Syllabus_Class_${selectedClass}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
 
-        <div class="table-title">
-          <span>Subject-wise Syllabus</span>
-          <span>${escapeHTML(cls)}</span>
-        </div>
+            html2pdf().set(opt).from(element).save();
+        }
 
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Syllabus / Portion</th>
-            </tr>
-          </thead>
-          <tbody>${rowsHTML}</tbody>
-        </table>
-
-        <div class="page-footer">
-          <div><strong>${CONFIG.schoolName}</strong> • ${CONFIG.address} • ${CONFIG.phones}</div>
-          <div class="page-number">Official Syllabus</div>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderCards() {
-    const wrap = document.getElementById("classCards");
-    const select = document.getElementById("classSelect");
-
-    const available = CLASS_NAMES.filter(c => Object.prototype.hasOwnProperty.call(classData, c));
-    const ordered = available.length ? available : CLASS_NAMES;
-
-    select.innerHTML = ordered.map(c =>
-      `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`
-    ).join("");
-
-    if (!ordered.includes(selectedClass)) selectedClass = ordered[0];
-    select.value = selectedClass;
-
-    wrap.innerHTML = ordered.map(cls => {
-      const n = (classData[cls] || []).length;
-      return `
-        <div class="class-card ${cls===selectedClass ? "active":""}" onclick="selectClass('${cls.replace(/'/g,"\\'")}')">
-          <small>CLASS</small>
-          <strong>${escapeHTML(cls)}</strong>
-          <span>${n} syllabus ${n===1 ? "entry":"entries"}</span>
-        </div>`;
-    }).join("");
-  }
-
-  function selectClass(cls) {
-    selectedClass = cls;
-    document.getElementById("classSelect").value = cls;
-    document.getElementById("previewTitle").textContent = `${cls} — Syllabus Preview`;
-    document.getElementById("rowCount").textContent = `${(classData[cls] || []).length} entries`;
-    document.getElementById("preview").innerHTML = renderPage(cls);
-    document.querySelectorAll(".class-card").forEach(card => {
-      card.classList.toggle("active", card.querySelector("strong")?.textContent === cls);
-    });
-    window.scrollTo({top: document.querySelector(".preview-wrap").offsetTop - 85, behavior:"smooth"});
-  }
-
-  async function loadSheet() {
-    const status = document.getElementById("status");
-    const preview = document.getElementById("preview");
-    status.textContent = "Refreshing…";
-    preview.innerHTML = `<div class="loading"><div class="spinner"></div><div>Reading syllabus from Google Sheets…</div></div>`;
-
-    try {
-      sheetRows = await fetchCSV();
-
-      examName = getCell(sheetRows, 0, 1);
-      session = getCell(sheetRows, 0, 5);
-      classData = buildData(sheetRows);
-
-      document.getElementById("heroSession").textContent = `Session: ${session || "—"}`;
-      document.getElementById("heroExam").textContent = `Examination: ${examName || "—"}`;
-      document.title = `${CONFIG.schoolName} — ${examName || "Syllabus"} ${session || ""}`;
-
-      const available = CLASS_NAMES.filter(c => classData[c] !== undefined);
-      status.textContent = `Updated just now • ${available.length} classes found`;
-      renderCards();
-      selectClass(selectedClass);
-    } catch (err) {
-      console.error(err);
-      status.textContent = "Unable to load";
-      preview.innerHTML = `
-        <div class="error">
-          <strong>Could not load the Google Sheet.</strong><br><br>
-          ${escapeHTML(err.message)}
-          <br><br>
-          <strong>Check these two things:</strong>
-          <ol>
-            <li>Open the Google Sheet → <strong>Share</strong> → make it accessible to anyone who needs to view the syllabus, or use <strong>Publish to the web</strong>.</li>
-            <li>Confirm the tab is named exactly <strong>syllabus</strong>.</li>
-          </ol>
-          Then click <strong>Refresh</strong>.
-        </div>`;
-    }
-  }
-
-  async function downloadElement(element, filename) {
-    if (!window.html2pdf) {
-      alert("PDF library has not loaded. Please check your internet connection and try again.");
-      return;
-    }
-
-    const options = {
-      margin: 0,
-      filename,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false
-      },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["css", "legacy"] }
-    };
-
-    await html2pdf().set(options).from(element).save();
-  }
-
-  async function downloadCurrent() {
-    const page = document.getElementById("printPage");
-    if (!page) return alert("Please wait for the syllabus to load.");
-    const safeExam = (examName || "Syllabus").replace(/[^\w\u0900-\u097F-]+/g,"-");
-    await downloadElement(page, `${CONFIG.schoolName.replace(/\s+/g,"-")}-${selectedClass}-${safeExam}.pdf`);
-  }
-
-  async function downloadAll() {
-    const classes = CLASS_NAMES.filter(c => classData[c] && classData[c].length);
-    if (!classes.length) return alert("No syllabus data is available.");
-
-    const holder = document.createElement("div");
-    holder.style.position = "fixed";
-    holder.style.left = "-100000px";
-    holder.style.top = "0";
-    holder.style.width = "210mm";
-    holder.style.background = "#fff";
-    holder.innerHTML = classes.map((c,i) => {
-      const page = renderPage(c);
-      return i === 0 ? page : page.replace('class="syllabus-page"', 'class="syllabus-page" style="page-break-before:always"');
-    }).join("");
-
-    document.body.appendChild(holder);
-    try {
-      await downloadElement(holder, `${CONFIG.schoolName.replace(/\s+/g,"-")}-${(examName || "Syllabus").replace(/[^\w\u0900-\u097F-]+/g,"-")}-All-Classes.pdf`);
-    } finally {
-      holder.remove();
-    }
-  }
-
-  loadSheet();
-</script>
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', fetchSheetData);
+    </script>
 </body>
 </html>
