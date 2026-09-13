@@ -1,31 +1,3 @@
-Here is the updated **`index.html`** code modified specifically to match the exact row layout and column pairings shown in your screenshot.
-
-### What Was Updated Based on Your Screenshot:
-
-1. **Row Index Adjustments**:
-* **Row 2** contains the class names (e.g., `Class | UKG`, `Class | 1st`, `Class | 2nd`, etc.).
-* **Rows 4 to 17** contain the **Subject & Syllabus** rows for the first block (Nursery to 5th).
-* **Row 18** contains class names for the second block (6th to 12th), and **Rows 20 to 33** contain the subject/syllabus details.
-
-
-2. **Column Pair Layout**:
-* Column pair 1: `A` (Subject) & `B` (Syllabus)
-* Column pair 2: `C` (Subject) & `D` (Syllabus)
-* Column pair 3: `E` (Subject) & `F` (Syllabus)
-* Column pair 4: `G` (Subject) & `H` (Syllabus)
-* Column pair 5: `I` (Subject) & `J` (Syllabus)
-* ... up to `P` for the upper block and `N` for the lower block.
-
-
-3. **Class Name Extraction**: The code now reads Class names from **Row 2** (for top block) and **Row 18** (for bottom block) from the right column of each 2-column group (e.g., reading `"UKG"`, `"1st"`, `"2nd"`, `"3rd"`, `"4th"`, `"5th"`).
-
----
-
-### Complete `index.html` Code
-
-Replace your current `index.html` in GitHub with this updated code:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
