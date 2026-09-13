@@ -16,13 +16,13 @@
 
     <style>
         :root {
-            /* Crimson & Burgundy Color Palette */
-            --header-burgundy: #4a0e17;
-            --class-crimson: #dc2626;
-            --banner-amber: #d97706;
-            --table-header: #380a11;
-            --row-alt-rose: #fff1f2;
-            --border-color: #fecdd3;
+            /* Purple & Lavender Color Palette */
+            --header-purple: #311b92;
+            --class-violet: #7c3aed;
+            --banner-gold: #eab308;
+            --table-header: #24126a;
+            --row-alt-lavender: #f5f3ff;
+            --border-color: #ddd6fe;
         }
 
         * {
@@ -33,7 +33,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #fcf4f5;
+            background-color: #f8f7ff;
             color: #1a1a1a;
             display: flex;
             flex-direction: column;
@@ -59,23 +59,23 @@
 
         .controls-container label {
             font-weight: 700;
-            color: var(--header-burgundy);
+            color: var(--header-purple);
             font-size: 14px;
         }
 
         .controls-container select {
             padding: 6px 10px;
-            border: 1.5px solid var(--class-crimson);
+            border: 1.5px solid var(--class-violet);
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             outline: none;
             background: #fff;
-            color: var(--header-burgundy);
+            color: var(--header-purple);
         }
 
         .btn-download {
-            background-color: var(--class-crimson);
+            background-color: var(--class-violet);
             color: #ffffff;
             padding: 8px 14px;
             border: none;
@@ -87,7 +87,7 @@
         }
 
         .btn-download:hover {
-            background-color: #b91c1c;
+            background-color: #6d28d9;
         }
 
         .btn-download:active {
@@ -108,9 +108,9 @@
             border-radius: 6px;
         }
 
-        /* Deep Burgundy Top Header */
+        /* Deep Purple Top Header */
         .header-bg {
-            background-color: var(--header-burgundy);
+            background-color: var(--header-purple);
             padding: 20px 15px 15px 15px;
             text-align: center;
             display: flex;
@@ -126,9 +126,9 @@
             margin-bottom: 15px;
         }
 
-        /* Vibrant Crimson Class Pill Box */
+        /* Electric Violet Class Pill Box */
         .class-pill {
-            background-color: var(--class-crimson);
+            background-color: var(--class-violet);
             color: #ffffff;
             font-size: 22px;
             font-weight: 700;
@@ -145,10 +145,10 @@
             padding: 12px;
         }
 
-        /* Golden Amber Banner */
+        /* Soft Gold Banner */
         .gold-banner {
-            background-color: var(--banner-amber);
-            color: #ffffff;
+            background-color: var(--banner-gold);
+            color: #1a1a1a;
             font-size: 16px;
             font-weight: 700;
             text-align: center;
@@ -195,7 +195,7 @@
 
         .subject-td {
             font-weight: 700;
-            color: var(--header-burgundy);
+            color: var(--header-purple);
             text-align: center;
         }
 
@@ -209,7 +209,7 @@
         }
 
         .syllabus-table tr:nth-child(even) td {
-            background-color: var(--row-alt-rose);
+            background-color: var(--row-alt-lavender);
         }
     </style>
 </head>
@@ -232,7 +232,7 @@
     <div class="card-wrapper">
         <div class="syllabus-card" id="syllabusContainer">
             
-            <!-- Deep Burgundy Top Bar with Logo & Class -->
+            <!-- Deep Purple Top Bar with Logo & Class -->
             <div class="header-bg">
                 <img src="logo.png" alt="Pinnacle Global School Logo" class="logo" onerror="this.src='https://via.placeholder.com/120?text=PGS+LOGO'">
                 <div class="class-pill" id="selectedClassLabel">Class : ---</div>
@@ -240,7 +240,7 @@
 
             <!-- Content Area -->
             <div class="card-content">
-                <!-- Golden Amber Banner -->
+                <!-- Soft Gold Banner -->
                 <div class="gold-banner" id="examBanner">Syllabus: Examination</div>
 
                 <!-- Syllabus Table -->
