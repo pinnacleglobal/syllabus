@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pinnacle Syllabus Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    #poster-area {
+      width: 780px;
+      min-height: 1120px;
+      background: radial-gradient(circle at top right, #edf4ff 0%, #ffffff 50%, #fff7ed 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-4">
+
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT SIDE: Controls & Teacher Edit Form -->
+    <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit space-y-4">
+      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <i class="fa-solid fa-graduation-cap text-[#072448]"></i> Syllabus Controller
+      </h2>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Class</label>
+        <select id="classDropdown" onchange="renderCurrentClass()" class="w-full border rounded-lg p-2.5 bg-slate-50 font-semibold text-slate-700">
+          <option value="Nursery">Nursery</option>
+          <option value="LKG">LKG</option>
+          <option value="UKG">UKG</option>
+          <option value="1st">1st</option>
+          <option value="2nd">2nd</option>
+          <option value="3rd">3rd</option>
+          <option value="4th">4th</option>
+          <option value="5th">5th</option>
+          <option value="6th">6th</option>
+          <option value="7th">7th</option>
+          <option value="8th">8th</option>
+          <option value="9th">9th</option>
+          <option value="10th">10th</option>
+          <option value="11th">11th</option>
+          <option value="12th">12th</option>
+        </select>
+      </div>
+
+      <div class="border-t pt-3 space-y-3">
+        <span class="text-xs font-bold text-slate-500 uppercase">Quick Edit / Update</span>
+        <input id="editSubject" type="text" placeholder="Subject (e.g. Hindi, Maths)" class="w-full border rounded-lg p-2 text-sm" />
+        <textarea id="editSyllabus" rows="3" placeholder="Syllabus details (new line for bullet points)" class="w-full border rounded-lg p-2 text-sm"></textarea>
+        <button onclick="updateSyllabus()" id="btnSave" class="w-full bg-[#072448] text-white py-2 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+          Update & Sync to Sheet
+        </button>
+      </div>
+
+      <div class="border-t pt-3 space-y-2">
+        <button onclick="fetchSheetData()" class="w-full border border-[#072448] text-[#072448] py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">
+          <i class="fa-solid fa-rotate mr-1"></i> Sync from Sheet
+        </button>
+        <button onclick="downloadPNG()" class="w-full bg-[#ff7b25] text-white py-2.5 rounded-lg text-sm font-bold shadow hover:bg-orange-600 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-download"></i> Download Poster (PNG)
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Live Rendered Poster -->
+    <div class="lg:col-span-8 flex justify-center overflow-x-auto">
+      
+      <div id="poster-area" class="relative border-4 border-[#072448] rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
+        
+        <!-- Decorative Academic Doodles -->
+        <i class="fa-solid fa-graduation-cap absolute top-6 left-6 text-slate-300 opacity-30 text-5xl pointer-events-none"></i>
+        <i class="fa-solid fa-book-open absolute top-6 right-6 text-slate-300 opacity-30 text-5xl pointer-events-none"></i>
+        <i class="fa-solid fa-atom absolute bottom-16 left-6 text-slate-300 opacity-30 text-5xl pointer-events-none"></i>
+        <i class="fa-solid fa-globe absolute bottom-16 right-6 text-slate-300 opacity-30 text-5xl pointer-events-none"></i>
+
+        <!-- HEADER -->
+        <div class="text-center relative z-10">
+          <div class="flex items-center justify-center gap-3">
+            <span class="h-0.5 w-12 bg-slate-800"></span>
+            <span id="txtExam" class="tracking-widest font-black text-xl text-slate-900 uppercase">HALF YEARLY EXAMINATION</span>
+            <span class="h-0.5 w-12 bg-slate-800"></span>
+          </div>
+
+          <h1 class="text-6xl font-black tracking-tight text-[#072448] mt-1 font-serif">SYLLABUS</h1>
+
+          <div class="inline-block bg-[#072448] text-amber-400 font-bold px-6 py-1 rounded-full text-xs tracking-wider uppercase mt-1">
+            ACADEMIC SESSION <span id="txtSession">2026-27</span>
+          </div>
+
+          <h2 class="text-2xl font-black text-[#072448] tracking-wide mt-3 uppercase">PINNACLE GLOBAL SCHOOL</h2>
+          <p class="text-[11px] tracking-widest font-bold text-slate-600 uppercase">Nurturing Minds • Shaping Futures</p>
+
+          <div class="mt-3 flex justify-center">
+            <div class="border-2 border-[#ff7b25] bg-white rounded-full px-8 py-1 shadow-sm">
+              <span id="txtClass" class="text-xl font-black text-[#072448] uppercase tracking-wider">CLASS - NURSERY</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE SECTION -->
+        <div class="mt-5 flex-grow relative z-10">
+          <div class="grid grid-cols-12 bg-[#072448] text-white font-bold rounded-t-xl py-2.5 px-4 text-sm">
+            <div class="col-span-4 flex items-center justify-center gap-2 tracking-wider">
+              <i class="fa-solid fa-book-bookmark text-amber-400"></i> SUBJECTS
+            </div>
+            <div class="col-span-8 flex items-center justify-center gap-2 tracking-wider">
+              <i class="fa-solid fa-list-check text-amber-400"></i> SYLLABUS
+            </div>
+          </div>
+
+          <div id="syllabusContainer" class="border-x-2 border-b-2 border-slate-200 rounded-b-xl bg-white divide-y-2 divide-slate-100">
+            <!-- Dynamic rows will inject here -->
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="mt-6 pt-3 border-t-2 border-slate-200 text-center relative z-10">
+          <div class="text-[11px] tracking-widest font-extrabold text-slate-700 uppercase">LEARN • GROW • EXCEL</div>
+          <div class="text-lg italic font-serif text-[#ff7b25] font-semibold">Together We Achieve More</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlNiG5LLV15JTEiSdiv8GfNGj-ciIyP9Rdku0-VYMSgiCdTA_HAFCZBZrxXlbSF0SA/exec";
+
+    const SUBJECT_ICONS = {
+      'HINDI': 'fa-solid fa-om',
+      'ENGLISH': 'fa-solid fa-font',
+      'MATHS': 'fa-solid fa-calculator',
+      'SCIENCE': 'fa-solid fa-flask',
+      'S.ST': 'fa-solid fa-landmark',
+      'COMPUTER': 'fa-solid fa-laptop-code',
+      'SANSKRIT': 'fa-solid fa-book-quran',
+      'G.K.': 'fa-solid fa-lightbulb',
+      'DRAWING': 'fa-solid fa-palette',
+      'M.V.': 'fa-solid fa-people-group'
+    };
+
+    let globalData = {
+      examName: "Half Yearly Examination",
+      session: "2026-27",
+      classes: {
+        "Nursery": [
+          { subject: "Hindi", syllabus: "ch 1" },
+          { subject: "English", syllabus: "ch 2" },
+          { subject: "Maths", syllabus: "ch 3" }
+        ]
+      }
+    };
+
+    function renderCurrentClass() {
+      const cls = document.getElementById("classDropdown").value;
+      document.getElementById("txtClass").innerText = "CLASS - " + cls.toUpperCase();
+      document.getElementById("txtExam").innerText = globalData.examName;
+      document.getElementById("txtSession").innerText = globalData.session;
+
+      const container = document.getElementById("syllabusContainer");
+      container.innerHTML = "";
+
+      const subjects = (globalData.classes && globalData.classes[cls]) ? globalData.classes[cls] : [];
+
+      if (subjects.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium">No syllabus entries found for ${cls} yet.</div>`;
+        return;
+      }
+
+      subjects.forEach(item => {
+        const icon = SUBJECT_ICONS[item.subject.toUpperCase()] || 'fa-solid fa-book';
+        const bullets = item.syllabus
+          .split('\n')
+          .filter(l => l.trim() !== '')
+          .map(l => `<div>${l.startsWith('•') ? l : '• ' + l}</div>`)
+          .join('');
+
+        const row = `
+          <div class="grid grid-cols-12 py-2.5 px-4 items-center">
+            <div class="col-span-4 flex items-center gap-3 pr-2 border-r border-slate-200">
+              <div class="w-8 h-8 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs font-bold shrink-0">
+                <i class="${icon}"></i>
+              </div>
+              <span class="font-extrabold text-[#072448] text-sm uppercase tracking-wide">${item.subject}</span>
+            </div>
+            <div class="col-span-8 pl-4 text-xs font-semibold text-slate-800 space-y-1">
+              ${bullets || '—'}
+            </div>
+          </div>
+        `;
+        container.innerHTML += row;
+      });
+    }
+
+    async function fetchSheetData() {
+      if (!SCRIPT_URL || SCRIPT_URL === "PASTE_YOUR_APPS_SCRIPT_URL_HERE") return;
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        globalData = data;
+        renderCurrentClass();
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    async function updateSyllabus() {
+      const className = document.getElementById("classDropdown").value;
+      const subject = document.getElementById("editSubject").value.trim();
+      const syllabus = document.getElementById("editSyllabus").value.trim();
+
+      if (!subject || !syllabus) {
+        alert("Please provide both Subject and Syllabus text.");
+        return;
+      }
+
+      if (!globalData.classes[className]) globalData.classes[className] = [];
+      const match = globalData.classes[className].find(s => s.subject.toLowerCase() === subject.toLowerCase());
+      if (match) {
+        match.syllabus = syllabus;
+      } else {
+        globalData.classes[className].push({ subject, syllabus });
+      }
+      renderCurrentClass();
+
+      document.getElementById("editSubject").value = "";
+      document.getElementById("editSyllabus").value = "";
+
+      if (SCRIPT_URL && SCRIPT_URL !== "PASTE_YOUR_APPS_SCRIPT_URL_HERE") {
+        const btn = document.getElementById("btnSave");
+        btn.innerText = "Syncing to Sheet...";
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ className, subject, syllabus })
+        });
+        btn.innerText = "Synced Successfully!";
+        setTimeout(() => { btn.innerText = "Update & Sync to Sheet"; }, 2000);
+      }
+    }
+
+    function downloadPNG() {
+      const node = document.getElementById("poster-area");
+      const cls = document.getElementById("classDropdown").value;
+      html2canvas(node, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = `Syllabus_${cls}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
+    window.onload = () => {
+      fetchSheetData();
+      renderCurrentClass();
+    };
+  </script>
+</body>
+</html>
