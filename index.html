@@ -9,20 +9,19 @@
     <link rel="icon" href="logo.png" type="image/png">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     
     <!-- html2canvas Library for Image Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         :root {
-            /* New Color Palette: Royal Navy, Vibrant Cyan, Warm Gold */
-            --header-dark: #0d1b2a;
-            --class-cyan: #0077b6;
-            --gold-banner: #e0a96d;
-            --table-header: #1b263b;
-            --row-alt: #f0f7ff;
-            --border-color: #d8e2dc;
+            --top-dark-blue: #093c85;
+            --class-blue: #007bff;
+            --gold-banner: #dca327;
+            --table-header-blue: #0c3978;
+            --row-alt-blue: #edf4ff;
+            --border-color: #d1dbe8;
         }
 
         * {
@@ -32,9 +31,9 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #eef2f5;
-            color: #1a1a1a;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f2f4f8;
+            color: #222;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -59,23 +58,23 @@
 
         .controls-container label {
             font-weight: 700;
-            color: var(--header-dark);
+            color: #0c3978;
             font-size: 14px;
         }
 
         .controls-container select {
             padding: 6px 10px;
-            border: 1.5px solid var(--class-cyan);
+            border: 1.5px solid #007bff;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             outline: none;
             background: #fff;
-            color: var(--header-dark);
+            color: #0c3978;
         }
 
         .btn-download {
-            background-color: var(--class-cyan);
+            background-color: #0c3978;
             color: #ffffff;
             padding: 8px 14px;
             border: none;
@@ -83,18 +82,14 @@
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-download:hover {
-            background-color: #023e8a;
+            transition: opacity 0.2s;
         }
 
         .btn-download:active {
             opacity: 0.8;
         }
 
-        /* Main Card Layout */
+        /* Main Card Layout (Matching uploaded picture) */
         .card-wrapper {
             width: 100%;
             max-width: 450px;
@@ -105,12 +100,12 @@
             width: 100%;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            border-radius: 6px;
+            border-radius: 4px;
         }
 
-        /* Header Dark Navy Banner */
+        /* Header Blue Banner */
         .header-bg {
-            background-color: var(--header-dark);
+            background-color: var(--top-dark-blue);
             padding: 20px 15px 15px 15px;
             text-align: center;
             display: flex;
@@ -128,7 +123,7 @@
 
         /* Class Pill Box */
         .class-pill {
-            background-color: var(--class-cyan);
+            background-color: var(--class-blue);
             color: #ffffff;
             font-size: 22px;
             font-weight: 700;
@@ -136,8 +131,7 @@
             padding: 10px 0;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         /* Main Body Padding */
@@ -148,7 +142,7 @@
         /* Gold Banner */
         .gold-banner {
             background-color: var(--gold-banner);
-            color: #1a1a1a;
+            color: #000000;
             font-size: 16px;
             font-weight: 700;
             text-align: center;
@@ -166,13 +160,13 @@
         }
 
         .syllabus-table th {
-            background-color: var(--table-header);
+            background-color: var(--table-header-blue);
             color: #ffffff;
             font-size: 14px;
             font-weight: 700;
             padding: 8px 10px;
             text-align: center;
-            border: 1px solid var(--table-header);
+            border: 1px solid var(--table-header-blue);
         }
 
         .syllabus-table th:first-child {
@@ -195,12 +189,12 @@
 
         .subject-td {
             font-weight: 700;
-            color: #0d1b2a;
+            color: #111111;
             text-align: center;
         }
 
         .syllabus-td {
-            color: #2b2b2b;
+            color: #222222;
             text-align: left;
         }
 
@@ -209,7 +203,7 @@
         }
 
         .syllabus-table tr:nth-child(even) td {
-            background-color: var(--row-alt);
+            background-color: var(--row-alt-blue);
         }
     </style>
 </head>
@@ -228,11 +222,11 @@
         </button>
     </div>
 
-    <!-- Syllabus Card Layout -->
+    <!-- Syllabus Printable / Saveable Area -->
     <div class="card-wrapper">
         <div class="syllabus-card" id="syllabusContainer">
             
-            <!-- Header Bar -->
+            <!-- Dark Blue Top Bar with Logo & Class -->
             <div class="header-bg">
                 <img src="logo.png" alt="Pinnacle Global School Logo" class="logo" onerror="this.src='https://via.placeholder.com/120?text=PGS+LOGO'">
                 <div class="class-pill" id="selectedClassLabel">Class : ---</div>
@@ -240,10 +234,10 @@
 
             <!-- Content Area -->
             <div class="card-content">
-                <!-- Banner -->
+                <!-- Gold Banner -->
                 <div class="gold-banner" id="examBanner">Syllabus: Examination</div>
 
-                <!-- Table -->
+                <!-- Syllabus Table -->
                 <table class="syllabus-table">
                     <thead>
                         <tr>
@@ -390,6 +384,7 @@
             }
 
             items.forEach(item => {
+                // Format bullets clean and tight
                 let formattedSyllabus = item.syllabus
                     .split('\n')
                     .map(line => line.trim())
