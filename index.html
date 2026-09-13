@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinnacle Syllabus Generator</title>
+  <title>Pinnacle Syllabus Portal</title>
   
   <link rel="icon" type="image/png" href="logo.png" />
 
@@ -13,141 +13,107 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
   <style>
+    /* Card is strictly budgeted for single mobile screen view and crisp export */
     #poster-area {
-      width: 750px;
+      width: 440px;
       height: fit-content;
       background: #ffffff;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Fixed table proportions that prevent html2canvas clipping */
+    .table-layout {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+    .table-row-item {
+      display: table-row;
     }
     .col-subj {
-      width: 32%;
-      flex-shrink: 0;
+      display: table-cell;
+      width: 155px;
+      vertical-align: middle;
     }
     .col-syl {
-      width: 68%;
-      flex-grow: 1;
+      display: table-cell;
+      width: 285px;
+      vertical-align: middle;
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
+<body class="bg-slate-100 min-h-screen p-3 flex flex-col items-center">
 
-  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- TOP TOOLBAR -->
+  <div class="w-full max-w-[440px] bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-3 space-y-2">
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-bold text-slate-600 uppercase shrink-0">Class:</label>
+      <select id="classDropdown" onchange="renderPoster()" class="flex-grow border border-slate-300 rounded-lg p-1.5 bg-slate-50 font-bold text-slate-800 text-sm">
+        <option value="Nursery">Nursery</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="1st">1st</option>
+        <option value="2nd">2nd</option>
+        <option value="3rd">3rd</option>
+        <option value="4th">4th</option>
+        <option value="5th">5th</option>
+        <option value="6th">6th</option>
+        <option value="7th">7th</option>
+        <option value="8th">8th</option>
+        <option value="9th">9th</option>
+        <option value="10th">10th</option>
+        <option value="11th">11th</option>
+        <option value="12th">12th</option>
+      </select>
+      <button onclick="loadGoogleSheetData()" title="Refresh Data" class="border border-[#072448] text-[#072448] px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50">
+        <i class="fa-solid fa-rotate"></i>
+      </button>
+      <button onclick="downloadPNG()" class="bg-[#ff7b25] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 shadow flex items-center gap-1">
+        <i class="fa-solid fa-download"></i> Save
+      </button>
+    </div>
+  </div>
 
-    <!-- CONTROLS PANEL -->
-    <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit space-y-4">
-      <h2 class="text-lg font-bold text-[#072448] flex items-center gap-2">
-        <i class="fa-solid fa-sliders"></i> Syllabus Dashboard
-      </h2>
+  <!-- POSTER CANVAS -->
+  <div id="poster-area" class="border-4 border-[#072448] rounded-3xl p-4 shadow-xl bg-white text-slate-800">
+    
+    <!-- HEADER -->
+    <div class="flex flex-col items-center text-center">
+      
+      <!-- Logo (Original Big Emblem) -->
+      <img src="logo.png" alt="Pinnacle School" class="w-24 h-24 object-contain mb-2 drop-shadow" onerror="this.style.display='none'"/>
 
-      <div>
-        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Class</label>
-        <select id="classDropdown" onchange="renderPoster()" class="w-full border rounded-lg p-2.5 bg-slate-50 font-semibold text-slate-700">
-          <option value="Nursery">Nursery</option>
-          <option value="LKG">LKG</option>
-          <option value="UKG">UKG</option>
-          <option value="1st">1st</option>
-          <option value="2nd">2nd</option>
-          <option value="3rd">3rd</option>
-          <option value="4th">4th</option>
-          <option value="5th">5th</option>
-          <option value="6th">6th</option>
-          <option value="7th">7th</option>
-          <option value="8th">8th</option>
-          <option value="9th">9th</option>
-          <option value="10th">10th</option>
-          <option value="11th">11th</option>
-          <option value="12th">12th</option>
-        </select>
+      <!-- Class Badge -->
+      <div class="w-full bg-[#0b5cbe] text-white rounded-xl py-1.5 shadow-sm text-center">
+        <span id="txtClass" class="text-lg font-black tracking-wider uppercase">Class : 7th</span>
       </div>
 
-      <div class="border-t pt-3 space-y-2">
-        <button onclick="loadGoogleSheetData()" class="w-full border border-[#072448] text-[#072448] py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-50 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-arrows-rotate"></i> Refresh from Google Sheet
-        </button>
-        <button onclick="downloadPNG()" class="w-full bg-[#ff7b25] text-white py-2.5 rounded-lg text-sm font-bold shadow hover:bg-orange-600 transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-download"></i> Download Poster (PNG)
-        </button>
-      </div>
-
-      <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-xs text-blue-900 leading-relaxed">
-        <i class="fa-solid fa-circle-info mr-1"></i> Changes typed into your Google Sheet update here when you tap <b>Refresh</b>.
+      <!-- Exam Name Ribbon (Forced Single Line) -->
+      <div class="w-full bg-[#d49e24] text-slate-900 rounded-lg py-1 px-2 mt-1.5 shadow-sm text-center">
+        <div id="txtExam" class="font-extrabold text-[13px] tracking-tight uppercase whitespace-nowrap overflow-hidden">
+          Syllabus : Half Yearly Examination
+        </div>
       </div>
     </div>
 
-    <!-- POSTER CANVAS -->
-    <div class="lg:col-span-8 flex justify-center overflow-x-auto">
+    <!-- TABLE SECTION -->
+    <div class="w-full mt-3 border-2 border-[#072448] rounded-xl overflow-hidden shadow-sm">
       
-      <div id="poster-area" class="relative border-4 border-[#072448] rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
-        
-        <!-- Corner Background Doodles -->
-        <i class="fa-solid fa-book-open absolute top-10 right-8 text-slate-200 text-6xl pointer-events-none opacity-30"></i>
-        <i class="fa-solid fa-atom absolute bottom-20 left-6 text-slate-200 text-5xl pointer-events-none opacity-30"></i>
-        <i class="fa-solid fa-globe absolute bottom-20 right-6 text-slate-200 text-5xl pointer-events-none opacity-30"></i>
-
-        <!-- HEADER SECTION (Mixture of Date Sheet Card & Original Syllabus) -->
-        <div class="relative z-10 w-full mb-3 flex flex-col items-center text-center">
-          
-          <!-- Large Top Centered Logo -->
-          <div class="mb-3">
-            <img src="logo.png" alt="Pinnacle Global School" class="w-32 h-32 object-contain drop-shadow-md mx-auto" onerror="this.style.display='none'"/>
+      <!-- Table Header -->
+      <div class="table-layout bg-[#072448] text-white font-bold py-2 text-xs uppercase tracking-wider">
+        <div class="table-row-item">
+          <div class="col-subj text-center border-r border-[#1a3a63] py-1.5">
+            <i class="fa-solid fa-book-bookmark text-amber-400 mr-1"></i> SUBJECT
           </div>
-
-          <!-- School Name & Subtitle -->
-          <h2 class="text-2xl font-black text-[#072448] tracking-wider uppercase leading-none">
-            PINNACLE GLOBAL SCHOOL
-          </h2>
-          <p class="text-[11px] tracking-widest font-bold text-slate-600 uppercase mt-1">
-            NURTURING MINDS • SHAPING FUTURES
-          </p>
-
-          <!-- Class Capsule Ribbon -->
-          <div class="w-full max-w-sm mt-3.5">
-            <div class="bg-[#0b5cbe] text-white rounded-xl py-2 shadow flex items-center justify-center">
-              <span id="txtClass" class="text-xl font-bold tracking-wide">Class : Nursery</span>
-            </div>
-          </div>
-
-          <!-- Exam Name Ribbon (from cell B1) -->
-          <div class="w-full max-w-lg mt-2.5">
-            <div class="bg-[#d49e24] text-slate-900 rounded-lg py-1.5 px-4 font-extrabold text-sm tracking-wide shadow-sm flex items-center justify-center uppercase">
-              <span id="txtExam">Syllabus : Half Yearly Examination</span>
-            </div>
-          </div>
-
-          <!-- Session Badge (from cell F1) -->
-          <div class="mt-2">
-            <span class="inline-block bg-[#072448] text-amber-300 font-bold px-5 py-1 rounded-full text-xs tracking-wider uppercase shadow">
-              <span id="txtSession">Session : 2026-27</span>
-            </span>
-          </div>
-
-        </div>
-
-        <!-- TABLE SECTION -->
-        <div class="w-full relative z-10 my-3">
-          
-          <!-- Unified Header (Date Sheet Blue Style) -->
-          <div class="flex bg-[#072448] text-white font-bold rounded-t-xl py-3 px-4 shadow text-sm">
-            <div class="col-subj border-r border-[#1a3a63] flex items-center justify-center gap-2 tracking-wider">
-              <i class="fa-solid fa-book-bookmark text-amber-400"></i> SUBJECT
-            </div>
-            <div class="col-syl flex items-center justify-center gap-2 tracking-wider pl-4">
-              <i class="fa-solid fa-list-check text-amber-400"></i> SYLLABUS
-            </div>
-          </div>
-
-          <!-- Dynamic Subject Rows -->
-          <div id="syllabusContainer" class="border-x-2 border-b-2 border-slate-200 rounded-b-xl bg-white divide-y divide-slate-200 shadow-sm">
-            <!-- Dynamic rows injected here -->
+          <div class="col-syl text-center py-1.5">
+            <i class="fa-solid fa-list-check text-amber-400 mr-1"></i> SYLLABUS
           </div>
         </div>
+      </div>
 
-        <!-- FOOTER SECTION -->
-        <div class="mt-4 pt-3 border-t-2 border-slate-200 text-center relative z-10">
-          <div class="text-[11px] tracking-widest font-extrabold text-slate-700 uppercase">LEARN • GROW • EXCEL</div>
-          <div class="text-lg italic font-serif text-[#ff7b25] font-semibold mt-0.5">Together We Achieve More</div>
-        </div>
-
+      <!-- Table Body Container -->
+      <div id="syllabusContainer" class="table-layout divide-y divide-slate-200 bg-white">
+        <!-- Injected via JavaScript -->
       </div>
 
     </div>
@@ -158,54 +124,53 @@
     // --------------------------------------------------------------------------
     // PASTE YOUR PUBLISHED "SYLLABUS" SHEET CSV URL BELOW:
     // --------------------------------------------------------------------------
-    const SYLLABUS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTtxGSVQwiqW5qdyeE-QtsIKVGxZuEir64DQMdG_70qBZ6zgAKCOsJAUg7rivXTwqDbctkF1Mh7gZOA/pub?gid=1915322612&single=true&output=csv";
+    const SYLLABUS_CSV_URL = "PASTE_YOUR_SYLLABUS_PUBLISHED_CSV_URL_HERE";
 
-    // Text icons or fontawesome icons matching template
+    // Dynamic icon generator: Hindi has "अ", English has "ABC", Sanskrit has "सं"
     function getSubjectIconHtml(subjectName) {
       const s = subjectName.trim().toUpperCase();
       
       if (s === 'HINDI') {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-sm shrink-0">अ</div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-xs shrink-0">अ</div>`;
       }
       if (s === 'ENGLISH') {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-[11px] shrink-0">ABC</div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-[9px] shrink-0">ABC</div>`;
       }
       if (s === 'SANSKRIT') {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-sm shrink-0">सं</div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] font-bold text-xs shrink-0">सं</div>`;
       }
       if (s.includes('MATH')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-calculator"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-calculator"></i></div>`;
       }
       if (s.includes('SCIENCE')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-flask"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-flask"></i></div>`;
       }
       if (s.includes('S.ST') || s.includes('SOCIAL')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-landmark"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-landmark"></i></div>`;
       }
       if (s.includes('COMP')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-laptop"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-laptop"></i></div>`;
       }
       if (s.includes('G.K') || s.includes('GK')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-lightbulb"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-lightbulb"></i></div>`;
       }
       if (s.includes('DRAW') || s.includes('ART')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-palette"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-palette"></i></div>`;
       }
       if (s.includes('M.V') || s.includes('VALUE')) {
-        return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-heart"></i></div>`;
+        return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-heart"></i></div>`;
       }
 
-      return `<div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs shrink-0"><i class="fa-solid fa-book"></i></div>`;
+      return `<div class="w-7 h-7 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0"><i class="fa-solid fa-book"></i></div>`;
     }
 
     let parsedData = {
       examName: "Half Yearly Examination",
-      session: "2026-27",
       classes: {}
     };
 
     function loadGoogleSheetData() {
-      if (!SYLLABUS_CSV_URL || SYLLABUS_CSV_URL === "PASTE_YOUR_SYLLABUS_PUBLISHED_CSV_URL_HERE") {
+      if (!SYLLABUS_CSV_URL || SYLLABUS_CSV_URL === "https://docs.google.com/spreadsheets/d/e/2PACX-1vTtxGSVQwiqW5qdyeE-QtsIKVGxZuEir64DQMdG_70qBZ6zgAKCOsJAUg7rivXTwqDbctkF1Mh7gZOA/pub?gid=1915322612&single=true&output=csv") {
         renderPlaceholder();
         return;
       }
@@ -218,18 +183,17 @@
           const rows = results.data;
           if (!rows || rows.length < 4) return;
 
-          // Exam in B1 (Row 0, Col 1) and Session in F1 (Row 0, Col 5)
-          if (rows[0]) {
-            parsedData.examName = rows[0][1] || "Half Yearly Examination";
-            parsedData.session = rows[0][5] || "2026-27";
+          // Exam title from B1 (Row index 0, Col index 1)
+          if (rows[0] && rows[0][1]) {
+            parsedData.examName = rows[0][1].trim();
           }
 
           parsedData.classes = {};
 
-          // Band 1: Nursery to 5th (Columns A to P = index 0 to 15, Rows 4 to 17 = index 3 to 16, Class header Row 2 = index 1)
+          // Band 1: Nursery to 5th (Cols A-P: 0 to 15, Rows 4 to 17: index 3 to 16, Class header Row 2: index 1)
           parseBand(rows, 1, 3, 16, 0, 15);
 
-          // Band 2: 6th to 12th (Columns A to N = index 0 to 13, Rows 20 to 33 = index 19 to 32, Class header Row 18 = index 17)
+          // Band 2: 6th to 12th (Cols A-N: 0 to 13, Rows 20 to 33: index 19 to 32, Class header Row 18: index 17)
           if (rows.length > 18) {
             parseBand(rows, 17, 19, 32, 0, 13);
           }
@@ -265,44 +229,61 @@
 
     function renderPoster() {
       const cls = document.getElementById("classDropdown").value;
-      
       document.getElementById("txtClass").innerText = "Class : " + cls;
-      document.getElementById("txtExam").innerText = "Syllabus : " + parsedData.examName;
-      document.getElementById("txtSession").innerText = "Session : " + parsedData.session;
+      
+      const examTitle = "Syllabus : " + (parsedData.examName || "Half Yearly Examination");
+      const examElem = document.getElementById("txtExam");
+      examElem.innerText = examTitle;
+
+      // Dynamic font size reduction if exam title is particularly long
+      if (examTitle.length > 30) {
+        examElem.style.fontSize = "11px";
+      } else {
+        examElem.style.fontSize = "13px";
+      }
 
       const container = document.getElementById("syllabusContainer");
       container.innerHTML = "";
 
-      // Match class accurately (case-insensitive)
       let subjects = parsedData.classes[cls];
       if (!subjects) {
-        const foundKey = Object.keys(parsedData.classes).find(k => k.toLowerCase() === cls.toLowerCase());
-        if (foundKey) subjects = parsedData.classes[foundKey];
+        const key = Object.keys(parsedData.classes).find(k => k.toLowerCase() === cls.toLowerCase());
+        if (key) subjects = parsedData.classes[key];
       }
 
       if (!subjects || subjects.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium text-sm">No syllabus entries found in Google Sheet for ${cls}.</div>`;
+        container.innerHTML = `
+          <div class="table-row-item">
+            <div colspan="2" class="p-4 text-center text-slate-400 font-medium text-xs">
+              No entries found in Google Sheet for ${cls}.
+            </div>
+          </div>`;
         return;
       }
 
       subjects.forEach(item => {
         const iconHtml = getSubjectIconHtml(item.subject);
 
+        // Supports multi-line syllabus text gracefully
         const bullets = item.syllabus
           .split('\n')
           .filter(l => l.trim() !== '')
-          .map(l => `<div class="leading-relaxed">${l.startsWith('•') ? l : '• ' + l}</div>`)
+          .map(l => `<div class="leading-tight">${l.startsWith('•') ? l : '• ' + l}</div>`)
           .join('');
 
         const row = `
-          <div class="flex items-center px-4 py-3 border-b border-slate-100 last:border-b-0">
-            <!-- Left Subject Column (Fixed width, never compresses) -->
-            <div class="col-subj flex items-center gap-3 pr-3 border-r border-slate-200">
-              ${iconHtml}
-              <span class="font-extrabold text-[#072448] text-sm uppercase tracking-wide truncate">${item.subject}</span>
+          <div class="table-row-item">
+            <!-- Subject Column: Dedicated width, icon + full title visible without ellipses -->
+            <div class="col-subj p-2 border-r border-slate-200">
+              <div class="flex items-center gap-1.5">
+                ${iconHtml}
+                <span class="font-extrabold text-[#072448] text-xs uppercase leading-tight whitespace-normal">
+                  ${item.subject}
+                </span>
+              </div>
             </div>
-            <!-- Right Syllabus Column (Expands naturally) -->
-            <div class="col-syl pl-4 text-xs font-semibold text-slate-800 space-y-0.5">
+            <!-- Syllabus Column: Full multi-line display -->
+            <div class="col-syl p-2 pl-3 text-[11px] font-semibold text-slate-800 space-y-0.5 whitespace-normal">
               ${bullets || '—'}
             </div>
           </div>
@@ -312,10 +293,10 @@
     }
 
     function renderPlaceholder() {
-      parsedData.classes["Nursery"] = [
-        { subject: "Hindi", syllabus: "Ch 1 Reader\nCh 1 to 3 Grammar" },
-        { subject: "English", syllabus: "Ch 2 Reader\nPoem: Two Little Hands" },
-        { subject: "Maths", syllabus: "Counting 1 to 20\nShapes & Patterns" }
+      parsedData.classes["7th"] = [
+        { subject: "English", syllabus: "• Chapter 1 to 5 Reader\n• Grammar: Nouns, Verbs, Tenses\n• Notice Writing & Comprehension" },
+        { subject: "Hindi", syllabus: "• पाठ 1 से 6\n• व्याकरण: संधि, समास\n• पत्र लेखन" },
+        { subject: "Maths", syllabus: "• Ch 1: Integers\n• Ch 2: Fractions & Decimals\n• Ch 3: Data Handling" }
       ];
       renderPoster();
     }
@@ -325,9 +306,11 @@
       const cls = document.getElementById("classDropdown").value;
 
       html2canvas(node, {
-        scale: 2,
+        scale: 3, // High-resolution output
         useCORS: true,
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: 0
       }).then(canvas => {
         const link = document.createElement("a");
         link.download = `Syllabus_${cls}.png`;
