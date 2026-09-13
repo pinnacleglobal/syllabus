@@ -16,13 +16,13 @@
 
     <style>
         :root {
-            /* Purple & Lavender Color Palette */
-            --header-purple: #311b92;
-            --class-violet: #7c3aed;
-            --banner-gold: #eab308;
-            --table-header: #24126a;
-            --row-alt-lavender: #f5f3ff;
-            --border-color: #ddd6fe;
+            /* New Color Palette: Royal Navy, Vibrant Cyan, Warm Gold */
+            --header-dark: #0d1b2a;
+            --class-cyan: #0077b6;
+            --gold-banner: #e0a96d;
+            --table-header: #1b263b;
+            --row-alt: #f0f7ff;
+            --border-color: #d8e2dc;
         }
 
         * {
@@ -33,7 +33,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f8f7ff;
+            background-color: #eef2f5;
             color: #1a1a1a;
             display: flex;
             flex-direction: column;
@@ -59,23 +59,23 @@
 
         .controls-container label {
             font-weight: 700;
-            color: var(--header-purple);
+            color: var(--header-dark);
             font-size: 14px;
         }
 
         .controls-container select {
             padding: 6px 10px;
-            border: 1.5px solid var(--class-violet);
+            border: 1.5px solid var(--class-cyan);
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             outline: none;
             background: #fff;
-            color: var(--header-purple);
+            color: var(--header-dark);
         }
 
         .btn-download {
-            background-color: var(--class-violet);
+            background-color: var(--class-cyan);
             color: #ffffff;
             padding: 8px 14px;
             border: none;
@@ -87,7 +87,7 @@
         }
 
         .btn-download:hover {
-            background-color: #6d28d9;
+            background-color: #023e8a;
         }
 
         .btn-download:active {
@@ -108,9 +108,9 @@
             border-radius: 6px;
         }
 
-        /* Deep Purple Top Header */
+        /* Header Dark Navy Banner */
         .header-bg {
-            background-color: var(--header-purple);
+            background-color: var(--header-dark);
             padding: 20px 15px 15px 15px;
             text-align: center;
             display: flex;
@@ -126,9 +126,9 @@
             margin-bottom: 15px;
         }
 
-        /* Electric Violet Class Pill Box */
+        /* Class Pill Box */
         .class-pill {
-            background-color: var(--class-violet);
+            background-color: var(--class-cyan);
             color: #ffffff;
             font-size: 22px;
             font-weight: 700;
@@ -140,14 +140,14 @@
             letter-spacing: 0.5px;
         }
 
-        /* Content Body Padding */
+        /* Main Body Padding */
         .card-content {
             padding: 12px;
         }
 
-        /* Soft Gold Banner */
+        /* Gold Banner */
         .gold-banner {
-            background-color: var(--banner-gold);
+            background-color: var(--gold-banner);
             color: #1a1a1a;
             font-size: 16px;
             font-weight: 700;
@@ -195,7 +195,7 @@
 
         .subject-td {
             font-weight: 700;
-            color: var(--header-purple);
+            color: #0d1b2a;
             text-align: center;
         }
 
@@ -209,7 +209,7 @@
         }
 
         .syllabus-table tr:nth-child(even) td {
-            background-color: var(--row-alt-lavender);
+            background-color: var(--row-alt);
         }
     </style>
 </head>
@@ -228,11 +228,11 @@
         </button>
     </div>
 
-    <!-- Syllabus Printable / Saveable Area -->
+    <!-- Syllabus Card Layout -->
     <div class="card-wrapper">
         <div class="syllabus-card" id="syllabusContainer">
             
-            <!-- Deep Purple Top Bar with Logo & Class -->
+            <!-- Header Bar -->
             <div class="header-bg">
                 <img src="logo.png" alt="Pinnacle Global School Logo" class="logo" onerror="this.src='https://via.placeholder.com/120?text=PGS+LOGO'">
                 <div class="class-pill" id="selectedClassLabel">Class : ---</div>
@@ -240,10 +240,10 @@
 
             <!-- Content Area -->
             <div class="card-content">
-                <!-- Soft Gold Banner -->
+                <!-- Banner -->
                 <div class="gold-banner" id="examBanner">Syllabus: Examination</div>
 
-                <!-- Syllabus Table -->
+                <!-- Table -->
                 <table class="syllabus-table">
                     <thead>
                         <tr>
