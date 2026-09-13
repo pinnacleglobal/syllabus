@@ -4,29 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pinnacle Syllabus Generator</title>
+  
+  <!-- Browser Favicon using your uploaded logo -->
+  <link rel="icon" type="image/png" href="logo.png" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
+    /* Fixed width for consistent WhatsApp export ratio; height adapts dynamically */
     #poster-area {
-      width: 720px;
-      min-height: 1050px;
-      background: #f8faff;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      width: 760px;
+      height: fit-content;
+      background: #fdfefe;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-4">
 
-  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- LEFT SIDE: Controls & Teacher Edit Form -->
-    <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-fit space-y-4">
-      <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-graduation-cap text-[#072448]"></i> Syllabus Controller
+    <!-- CONTROLS PANEL -->
+    <div class="lg:col-span-4 bg-white p-5 rounded-2xl shadow border border-slate-200 h-fit space-y-4">
+      <h2 class="text-lg font-bold text-[#072448] flex items-center gap-2">
+        <i class="fa-solid fa-pen-to-square"></i> Syllabus Controller
       </h2>
 
-      <!-- Select Class -->
       <div>
         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Class</label>
         <select id="classDropdown" onchange="renderCurrentClass()" class="w-full border rounded-lg p-2.5 bg-slate-50 font-semibold text-slate-700">
@@ -48,9 +53,8 @@
         </select>
       </div>
 
-      <!-- Quick Edit with Dynamic Subject Dropdown -->
       <div class="border-t pt-3 space-y-3">
-        <span class="text-xs font-bold text-slate-500 uppercase">Teacher Entry / Update</span>
+        <span class="text-xs font-bold text-slate-500 uppercase">Subject Entry & Sync</span>
         
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Select Subject</label>
@@ -60,18 +64,18 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Syllabus Details</label>
-          <textarea id="editSyllabus" rows="3" placeholder="Type syllabus (e.g. Ch 1, Ch 2...)" class="w-full border rounded-lg p-2 text-sm"></textarea>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Syllabus Topics</label>
+          <textarea id="editSyllabus" rows="4" placeholder="Enter topics (e.g. Ch 1, Ch 2...)" class="w-full border rounded-lg p-2 text-sm"></textarea>
         </div>
 
-        <button onclick="updateSyllabus()" id="btnSave" class="w-full bg-[#072448] text-white py-2 rounded-lg text-sm font-semibold hover:bg-slate-800 transition">
+        <button onclick="updateSyllabus()" id="btnSave" class="w-full bg-[#072448] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-800 transition shadow">
           Update & Sync to Sheet
         </button>
       </div>
 
       <div class="border-t pt-3 space-y-2">
         <button onclick="fetchSheetData()" class="w-full border border-[#072448] text-[#072448] py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition">
-          <i class="fa-solid fa-rotate mr-1"></i> Sync from Sheet
+          <i class="fa-solid fa-rotate mr-1"></i> Refresh From Sheet
         </button>
         <button onclick="downloadPNG()" class="w-full bg-[#ff7b25] text-white py-2.5 rounded-lg text-sm font-bold shadow hover:bg-orange-600 transition flex items-center justify-center gap-2">
           <i class="fa-solid fa-download"></i> Download Poster (PNG)
@@ -79,70 +83,86 @@
       </div>
     </div>
 
-    <!-- RIGHT SIDE: Fixed Pixel-Perfect Poster Preview -->
+    <!-- POSTER CANVAS -->
     <div class="lg:col-span-8 flex justify-center overflow-x-auto">
       
-      <div id="poster-area" class="relative border-4 border-[#072448] rounded-3xl p-8 shadow-2xl flex flex-col justify-between">
+      <div id="poster-area" class="relative border-4 border-[#072448] rounded-3xl p-6 shadow-2xl flex flex-col justify-between">
         
-        <!-- Subtle Corner Academic Doodles -->
-        <i class="fa-solid fa-graduation-cap absolute top-6 left-6 text-slate-200 text-6xl pointer-events-none"></i>
-        <i class="fa-solid fa-book-open absolute top-6 right-6 text-slate-200 text-6xl pointer-events-none"></i>
-        <i class="fa-solid fa-atom absolute bottom-16 left-6 text-slate-200 text-6xl pointer-events-none"></i>
-        <i class="fa-solid fa-globe absolute bottom-16 right-6 text-slate-200 text-6xl pointer-events-none"></i>
+        <!-- Corner Background Doodles -->
+        <i class="fa-solid fa-book-open absolute top-8 right-8 text-slate-200 text-6xl pointer-events-none opacity-40"></i>
+        <i class="fa-solid fa-atom absolute bottom-16 left-6 text-slate-200 text-5xl pointer-events-none opacity-40"></i>
+        <i class="fa-solid fa-globe absolute bottom-16 right-6 text-slate-200 text-5xl pointer-events-none opacity-40"></i>
 
-        <!-- HEADER (Resolved Overlaps & Improved Spacing) -->
-        <div class="text-center relative z-10 space-y-2">
-          <div class="flex items-center justify-center gap-3">
-            <span class="h-0.5 w-12 bg-slate-800"></span>
-            <span id="txtExam" class="tracking-widest font-black text-xl text-slate-900 uppercase">HALF YEARLY EXAMINATION</span>
-            <span class="h-0.5 w-12 bg-slate-800"></span>
-          </div>
-
-          <!-- Title with proper vertical margin to prevent badge overlap -->
-          <div class="py-1">
-            <h1 class="text-6xl font-black tracking-wider text-[#072448] font-serif uppercase">SYLLABUS</h1>
-          </div>
-
-          <!-- Session Badge clearly separated below title -->
-          <div>
-            <span class="inline-block bg-[#072448] text-amber-400 font-bold px-6 py-1.5 rounded-full text-xs tracking-wider uppercase shadow">
-              ACADEMIC SESSION <span id="txtSession">2026-27</span>
-            </span>
-          </div>
-
-          <div class="pt-2">
-            <h2 class="text-2xl font-black text-[#072448] tracking-wider uppercase">PINNACLE GLOBAL SCHOOL</h2>
-            <p class="text-[11px] tracking-widest font-bold text-slate-600 uppercase mt-0.5">NURTURING MINDS • SHAPING FUTURES</p>
-          </div>
-
-          <div class="pt-2 flex justify-center">
-            <div class="border-2 border-[#ff7b25] bg-white rounded-full px-8 py-1.5 shadow-sm">
-              <span id="txtClass" class="text-xl font-black text-[#072448] uppercase tracking-wider">CLASS - NURSERY</span>
+        <!-- TOP HEADER SECTION -->
+        <div class="relative z-10 w-full mb-4">
+          
+          <!-- Top Row: Logo on Left, Exam Subheading in Center -->
+          <div class="flex items-center justify-between min-h-[90px]">
+            <!-- School Crest/Logo (Reads logo.png directly from repo root) -->
+            <div class="w-24 shrink-0 flex items-center justify-start">
+              <img src="logo.png" alt="School Crest" class="w-20 h-20 object-contain drop-shadow" onerror="this.style.display='none'"/>
             </div>
+
+            <!-- Exam Heading Centered -->
+            <div class="flex-grow text-center pr-24">
+              <div class="flex items-center justify-center gap-2">
+                <span class="h-[2px] w-8 bg-slate-700"></span>
+                <span id="txtExam" class="tracking-widest font-black text-xl text-slate-900 uppercase">HALF YEARLY</span>
+                <span class="h-[2px] w-8 bg-slate-700"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Typography Stack -->
+          <div class="text-center flex flex-col items-center">
+            
+            <h1 class="text-6xl font-black tracking-tight text-[#072448] font-serif uppercase my-0 leading-none">
+              SYLLABUS
+            </h1>
+
+            <div class="mt-2.5">
+              <span class="bg-[#072448] text-amber-400 font-bold px-7 py-1 rounded-full text-xs tracking-wider uppercase shadow inline-block">
+                ACADEMIC SESSION <span id="txtSession">2026-27</span>
+              </span>
+            </div>
+
+            <h2 class="text-2xl font-black text-[#072448] tracking-wider uppercase mt-3 leading-tight">
+              PINNACLE GLOBAL SCHOOL
+            </h2>
+            <p class="text-[11px] tracking-widest font-bold text-slate-600 uppercase mt-0.5">
+              NURTURING MINDS • SHAPING FUTURES
+            </p>
+
+            <div class="mt-3">
+              <div class="border-2 border-[#ff7b25] bg-white rounded-full px-8 py-1 shadow-sm inline-block">
+                <span id="txtClass" class="text-xl font-black text-[#072448] uppercase tracking-wider">CLASS - NURSERY</span>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <!-- TABLE SECTION (Aligned Column Headers and Dividing Border) -->
-        <div class="mt-6 flex-grow relative z-10">
+        <!-- TABLE SECTION -->
+        <div class="w-full relative z-10 my-2">
           
-          <!-- Table Header -->
-          <div class="flex bg-[#072448] text-white font-bold rounded-t-2xl py-3 px-4 shadow">
-            <div class="w-2/5 flex items-center justify-center gap-2 tracking-wider text-sm border-r border-[#1a3a63]">
+          <!-- Unified Header Grid (35% - 65%) -->
+          <div class="grid grid-cols-12 bg-[#072448] text-white font-bold rounded-t-xl py-2.5 shadow text-sm">
+            <div class="col-span-4 border-r border-[#1a3a63] flex items-center justify-center gap-2 tracking-wider">
               <i class="fa-solid fa-book-bookmark text-amber-400"></i> SUBJECTS
             </div>
-            <div class="w-3/5 flex items-center justify-center gap-2 tracking-wider text-sm">
+            <div class="col-span-8 flex items-center justify-center gap-2 tracking-wider">
               <i class="fa-solid fa-list-check text-amber-400"></i> SYLLABUS
             </div>
           </div>
 
-          <!-- Rows Container -->
-          <div id="syllabusContainer" class="border-x-2 border-b-2 border-slate-200 rounded-b-2xl bg-white divide-y divide-slate-200 shadow-sm">
-            <!-- Dynamic rows will inject here -->
+          <!-- Data Rows Container -->
+          <div id="syllabusContainer" class="border-x-2 border-b-2 border-slate-200 rounded-b-xl bg-white divide-y divide-slate-200 shadow-sm">
+            <!-- Injected via JavaScript -->
           </div>
         </div>
 
-        <!-- FOOTER -->
-        <div class="mt-8 pt-4 border-t-2 border-slate-200 text-center relative z-10">
+        <!-- FOOTER SECTION (Sits immediately under table content) -->
+        <div class="mt-6 pt-3 border-t-2 border-slate-200 text-center relative z-10">
           <div class="text-[11px] tracking-widest font-extrabold text-slate-700 uppercase">LEARN • GROW • EXCEL</div>
           <div class="text-xl italic font-serif text-[#ff7b25] font-semibold mt-0.5">Together We Achieve More</div>
         </div>
@@ -155,7 +175,7 @@
 
   <script>
     // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlNiG5LLV15JTEiSdiv8GfNGj-ciIyP9Rdku0-VYMSgiCdTA_HAFCZBZrxXlbSF0SA/exec";
+    const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
 
     const SUBJECT_ICONS = {
       'HINDI': 'fa-solid fa-om',
@@ -171,7 +191,7 @@
     };
 
     let globalData = {
-      examName: "Half Yearly Examination",
+      examName: "Half Yearly",
       session: "2026-27",
       masterSubjects: ["Hindi", "English", "Maths", "Science", "S.St", "Computer", "Sanskrit", "Drawing", "G.K."],
       classes: {
@@ -206,7 +226,7 @@
       const subjects = (globalData.classes && globalData.classes[cls]) ? globalData.classes[cls] : [];
 
       if (subjects.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium">No syllabus entries found for ${cls}.</div>`;
+        container.innerHTML = `<div class="p-6 text-center text-slate-400 font-medium text-sm">No syllabus entries found for ${cls}.</div>`;
         return;
       }
 
@@ -219,14 +239,14 @@
           .join('');
 
         const row = `
-          <div class="flex items-center px-4 py-3">
-            <div class="w-2/5 flex items-center gap-3 pr-4 border-r border-slate-200">
-              <div class="w-9 h-9 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs font-bold shrink-0">
+          <div class="grid grid-cols-12 items-center py-2.5 px-4">
+            <div class="col-span-4 flex items-center gap-3 pr-3 border-r border-slate-200">
+              <div class="w-8 h-8 rounded-full border-2 border-[#072448] flex items-center justify-center text-[#072448] text-xs font-bold shrink-0">
                 <i class="${icon}"></i>
               </div>
               <span class="font-extrabold text-[#072448] text-sm uppercase tracking-wide truncate">${item.subject}</span>
             </div>
-            <div class="w-3/5 pl-5 text-xs font-semibold text-slate-800 space-y-0.5">
+            <div class="col-span-8 pl-4 text-xs font-semibold text-slate-800 space-y-0.5">
               ${bullets || '—'}
             </div>
           </div>
@@ -277,12 +297,12 @@
 
       if (SCRIPT_URL && SCRIPT_URL !== "PASTE_YOUR_APPS_SCRIPT_URL_HERE") {
         const btn = document.getElementById("btnSave");
-        btn.innerText = "Syncing to Sheet...";
+        btn.innerText = "Syncing...";
         await fetch(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify({ className, subject, syllabus })
         });
-        btn.innerText = "Synced Successfully!";
+        btn.innerText = "Synced!";
         setTimeout(() => { btn.innerText = "Update & Sync to Sheet"; }, 2000);
       }
     }
@@ -290,7 +310,12 @@
     function downloadPNG() {
       const node = document.getElementById("poster-area");
       const cls = document.getElementById("classDropdown").value;
-      html2canvas(node, { scale: 2, useCORS: true }).then(canvas => {
+
+      html2canvas(node, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null
+      }).then(canvas => {
         const link = document.createElement("a");
         link.download = `Syllabus_${cls}.png`;
         link.href = canvas.toDataURL("image/png");
