@@ -3,325 +3,654 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pinnacle Syllabus Portal</title>
-  
-  <link rel="icon" type="image/png" href="logo.png" />
+  <title>Pinnacle Global School — Syllabus Portal</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Compact, fixed-width card tailored for standard mobile screen viewing & clean image downloads */
-    #poster-area {
-      width: 420px;
-      height: fit-content;
-      background: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    :root{
+      --navy:#062a63;
+      --navy2:#0b3b82;
+      --gold:#e7ad35;
+      --gold2:#f4cf6a;
+      --orange:#e46b24;
+      --ink:#17233d;
+      --muted:#667085;
+      --paper:#ffffff;
+      --bg:#eef3f9;
+      --line:#d9e2ef;
+      --shadow:0 18px 55px rgba(9,38,82,.13);
     }
 
-    /* Fixed table styling: html2canvas respects this 100% without hiding/compressing text */
-    .poster-table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:linear-gradient(135deg,#edf3fa 0%,#f8fafc 55%,#eaf1f9 100%);
+      color:var(--ink);
+      font-family:"DM Sans","Noto Sans Devanagari",sans-serif;
     }
-    .poster-table th, .poster-table td {
-      border: 1px solid #e2e8f0;
+
+    .app{min-height:100vh}
+    .topbar{
+      position:sticky; top:0; z-index:20;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid rgba(6,42,99,.10);
     }
-    .col-subject-width {
-      width: 145px;
+    .topbar-inner{
+      max-width:1280px; margin:auto; padding:13px 22px;
+      display:flex; align-items:center; gap:18px;
     }
-    .col-syllabus-width {
-      width: 275px;
+    .brand-mini{display:flex;align-items:center;gap:12px;min-width:245px}
+    .brand-mini img{width:52px;height:52px;object-fit:contain}
+    .brand-mini strong{display:block;color:var(--navy);font-size:16px;letter-spacing:.2px}
+    .brand-mini span{display:block;color:#7a879a;font-size:11px;margin-top:2px}
+    .top-actions{margin-left:auto;display:flex;gap:9px;flex-wrap:wrap}
+    button{
+      border:0; cursor:pointer; font:inherit;
+      border-radius:11px; padding:10px 14px;
+      transition:.18s ease; font-weight:700;
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-light{background:#eef3f9;color:var(--navy)}
+    .btn-primary{background:var(--navy);color:#fff;box-shadow:0 8px 20px rgba(6,42,99,.18)}
+    .btn-gold{background:linear-gradient(135deg,var(--gold),#f2c85b);color:#152544}
+    .btn-danger{background:#fff0ee;color:#a93524}
+
+    .hero{
+      max-width:1280px; margin:28px auto 18px; padding:0 22px;
+    }
+    .hero-card{
+      overflow:hidden; position:relative;
+      background:
+        radial-gradient(circle at 92% 10%,rgba(231,173,53,.28),transparent 22%),
+        radial-gradient(circle at 5% 90%,rgba(30,109,195,.16),transparent 26%),
+        linear-gradient(120deg,#06265a,#0b3c83 55%,#092c66);
+      border-radius:25px; color:white; box-shadow:var(--shadow);
+      padding:30px 34px;
+    }
+    .hero-card:after{
+      content:""; position:absolute; inset:auto -60px -85px auto;
+      width:240px;height:240px;border:2px solid rgba(244,207,106,.28);
+      border-radius:50%;
+    }
+    .hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center}
+    .eyebrow{
+      display:inline-flex;gap:8px;align-items:center;
+      padding:7px 11px;border:1px solid rgba(255,255,255,.24);
+      background:rgba(255,255,255,.08);border-radius:999px;
+      font-size:12px;letter-spacing:.8px;text-transform:uppercase;
+    }
+    h1{font-family:"Libre Baskerville",serif;font-size:clamp(30px,4vw,49px);line-height:1.08;margin:14px 0 9px}
+    .hero p{margin:0;color:#dce7f7;max-width:700px;font-size:15px;line-height:1.65}
+    .meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+    .meta-pill{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);padding:9px 12px;border-radius:10px;font-size:13px}
+    .hero-logo{display:flex;justify-content:flex-end}
+    .hero-logo img{width:min(245px,70%);filter:drop-shadow(0 14px 25px rgba(0,0,0,.22))}
+
+    .controls{
+      max-width:1280px;margin:0 auto;padding:0 22px 18px;
+      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    }
+    .selector{
+      background:#fff;border:1px solid var(--line);border-radius:13px;
+      padding:12px 14px;min-width:220px;color:var(--navy);
+      font:600 14px "DM Sans","Noto Sans Devanagari",sans-serif;
+      outline:none;
+    }
+    .status{margin-left:auto;color:var(--muted);font-size:12px}
+
+    .classes{
+      max-width:1280px;margin:0 auto;padding:0 22px 45px;
+      display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    }
+    .class-card{
+      background:#fff;border:1px solid var(--line);border-radius:17px;
+      padding:17px;box-shadow:0 7px 22px rgba(10,38,75,.05);
+      cursor:pointer;position:relative;overflow:hidden;
+    }
+    .class-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold)}
+    .class-card.active{border-color:#7da2d5;box-shadow:0 12px 30px rgba(6,42,99,.12);transform:translateY(-2px)}
+    .class-card small{color:#7b8798;font-size:11px}
+    .class-card strong{display:block;font-size:21px;color:var(--navy);margin-top:4px}
+    .class-card span{font-size:12px;color:#667085}
+
+    .preview-wrap{max-width:1280px;margin:0 auto 60px;padding:0 22px}
+    .preview-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px}
+    .preview-head h2{margin:0;color:var(--navy);font-size:23px}
+    .preview-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
+    .paper-shell{background:#dfe7f1;border-radius:22px;padding:22px;box-shadow:inset 0 0 0 1px #d0d9e5}
+
+    /* The actual printable page */
+    .syllabus-page{
+      width:210mm; min-height:297mm; margin:0 auto; background:#fff;
+      position:relative; overflow:hidden; color:#17233d;
+      box-shadow:0 12px 40px rgba(7,35,74,.13);
+      padding:13mm 12mm 15mm;
+      font-family:"DM Sans","Noto Sans Devanagari",sans-serif;
+    }
+    .page-frame{
+      position:absolute;inset:5mm;border:1px solid #e2e8f0;border-radius:5mm;pointer-events:none;
+    }
+    .page-topline{height:4px;background:linear-gradient(90deg,var(--navy),var(--gold),var(--orange));border-radius:5px;margin-bottom:9mm}
+    .school-head{display:grid;grid-template-columns:24mm 1fr 24mm;align-items:center;gap:5mm}
+    .school-logo{width:23mm;height:23mm;object-fit:contain}
+    .school-center{text-align:center}
+    .school-center .school-name{
+      font-family:"Libre Baskerville",serif;font-size:20px;color:var(--navy);
+      letter-spacing:.2px;line-height:1.2;
+    }
+    .school-center .tagline{font-size:8px;letter-spacing:2px;color:#7d8795;margin-top:3px;text-transform:uppercase}
+    .exam-title{
+      margin-top:7mm;text-align:center;font-size:22px;font-weight:800;
+      color:var(--navy);letter-spacing:1.3px;text-transform:uppercase;
+    }
+    .gold-rule{width:70mm;height:1.5px;background:var(--gold);margin:2.3mm auto 4mm}
+    .info-strip{
+      display:grid;grid-template-columns:1fr 1fr 1fr;
+      border:1px solid #e2e8f0;border-radius:3mm;overflow:hidden;margin-bottom:5mm;
+      background:#f8fafc;
+    }
+    .info-box{padding:3mm 4mm;text-align:center;border-right:1px solid #e2e8f0}
+    .info-box:last-child{border-right:0}
+    .info-label{font-size:7px;color:#7b8798;text-transform:uppercase;letter-spacing:1px}
+    .info-value{font-size:11px;font-weight:800;color:var(--navy);margin-top:1mm}
+    .table-title{
+      display:flex;align-items:center;justify-content:space-between;
+      margin:0 0 2.5mm;color:#253b5e;font-size:10px;font-weight:800;
+      text-transform:uppercase;letter-spacing:1px;
+    }
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid #dce5ef;border-radius:3mm;overflow:hidden}
+    thead th{
+      background:linear-gradient(135deg,#062a63,#0b438f);color:#fff;
+      padding:3.1mm 3.4mm;font-size:9px;text-align:left;
+      letter-spacing:.6px;text-transform:uppercase;
+    }
+    thead th:first-child{width:29%}
+    tbody td{
+      padding:3mm 3.4mm;border-top:1px solid #e1e7ef;
+      vertical-align:top;font-size:9px;line-height:1.5;
+      white-space:pre-wrap;overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+    tbody tr:nth-child(even) td{background:#f8fbfe}
+    tbody td:first-child{font-weight:800;color:#17375f}
+    .subject-cell{display:flex;align-items:flex-start;gap:2.5mm}
+    .subject-dot{
+      flex:0 0 6mm;height:6mm;border-radius:50%;
+      background:#eaf1fb;color:var(--navy);display:flex;align-items:center;justify-content:center;
+      font-size:8px;font-weight:800;
+    }
+    .empty-note{text-align:center;padding:16mm 4mm;color:#8a95a6;font-size:10px}
+    .page-footer{
+      position:absolute;left:12mm;right:12mm;bottom:7mm;
+      border-top:1px solid #e4e9ef;padding-top:3mm;
+      display:flex;justify-content:space-between;gap:8mm;
+      color:#7b8798;font-size:7.5px;
+    }
+    .page-footer strong{color:var(--navy)}
+    .page-number{font-weight:700;color:#7a5a10}
+
+    .loading{
+      min-height:300px;display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:12px;color:#667085;background:#fff;border-radius:15px;
+    }
+    .spinner{width:28px;height:28px;border:3px solid #d9e2ef;border-top-color:var(--navy);border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error{
+      background:#fff4f2;border:1px solid #ffd1ca;color:#8d3125;border-radius:14px;padding:18px;
+      line-height:1.6;font-size:13px;
+    }
+
+    .help{
+      max-width:1280px;margin:0 auto 45px;padding:0 22px;
+    }
+    details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+    summary{cursor:pointer;font-weight:800;color:var(--navy)}
+    details p{font-size:13px;color:#5e6b7d;line-height:1.65}
+    code{background:#eef3f9;padding:2px 5px;border-radius:5px}
+
+    @media(max-width:900px){
+      .hero-grid{grid-template-columns:1fr}.hero-logo{justify-content:flex-start}
+      .hero-logo img{width:140px}
+      .classes{grid-template-columns:repeat(2,1fr)}
+      .status{width:100%;margin-left:0}
+    }
+    @media(max-width:600px){
+      .topbar-inner{padding:10px 13px}.brand-mini{min-width:0}.brand-mini img{width:43px;height:43px}
+      .brand-mini span{display:none}.top-actions button{padding:9px 10px;font-size:12px}
+      .hero,.controls,.classes,.preview-wrap,.help{padding-left:13px;padding-right:13px}
+      .hero-card{padding:24px 20px;border-radius:18px}
+      .classes{grid-template-columns:1fr 1fr;gap:10px}
+      .class-card{padding:13px}.class-card strong{font-size:17px}
+      .paper-shell{padding:8px;overflow:auto}
+      .syllabus-page{transform-origin:top left}
+    }
+
+    @media print{
+      @page{size:A4 portrait;margin:0}
+      body{background:#fff}
+      .topbar,.hero,.controls,.classes,.preview-head,.help{display:none!important}
+      .preview-wrap{padding:0;margin:0}
+      .paper-shell{padding:0;background:#fff;box-shadow:none}
+      .syllabus-page{box-shadow:none;margin:0}
     }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-3 flex flex-col items-center">
 
-  <!-- TOP CONTROLS -->
-  <div class="w-full max-w-[420px] bg-white p-2.5 rounded-2xl shadow-sm border border-slate-200 mb-3 flex items-center gap-2">
-    <span class="text-xs font-bold text-slate-600 uppercase">Class:</span>
-    <select id="classDropdown" onchange="renderPoster()" class="flex-grow border border-slate-300 rounded-lg p-1.5 bg-slate-50 font-bold text-slate-800 text-sm">
-      <option value="Nursery">Nursery</option>
-      <option value="LKG">LKG</option>
-      <option value="UKG">UKG</option>
-      <option value="1st">1st</option>
-      <option value="2nd">2nd</option>
-      <option value="3rd">3rd</option>
-      <option value="4th">4th</option>
-      <option value="5th">5th</option>
-      <option value="6th">6th</option>
-      <option value="7th">7th</option>
-      <option value="8th">8th</option>
-      <option value="9th">9th</option>
-      <option value="10th">10th</option>
-      <option value="11th">11th</option>
-      <option value="12th">12th</option>
-    </select>
-    <button onclick="fetchSheetDataDirect()" title="Reload from Sheet" class="border border-[#072448] text-[#072448] px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-50">
-      <i class="fa-solid fa-rotate"></i>
-    </button>
-    <button onclick="downloadPNG()" class="bg-[#ff7b25] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-orange-600 shadow flex items-center gap-1">
-      <i class="fa-solid fa-download"></i> Save
-    </button>
-  </div>
-
-  <!-- POSTER CARD -->
-  <div id="poster-area" class="border-4 border-[#072448] rounded-3xl p-3.5 shadow-xl bg-white text-slate-800">
-    
-    <!-- HEADER -->
-    <div class="flex flex-col items-center text-center">
-      
-      <!-- Big Logo -->
-      <img src="logo.png" alt="Pinnacle School" class="w-24 h-24 object-contain mb-2 drop-shadow" onerror="this.style.display='none'"/>
-
-      <!-- Class Badge -->
-      <div class="w-full bg-[#0b5cbe] text-white rounded-xl py-1.5 shadow-sm text-center">
-        <span id="txtClass" class="text-base font-black tracking-wider uppercase">Class : 7th</span>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-mini">
+        <img src="logo.png" alt="Pinnacle Global School logo" onerror="this.style.visibility='hidden'">
+        <div>
+          <strong>Pinnacle Global School</strong>
+          <span>Syllabus Portal • Academic Session</span>
+        </div>
       </div>
+      <div class="top-actions">
+        <button class="btn-light" onclick="loadSheet()">↻ Refresh</button>
+        <button class="btn-primary" onclick="downloadCurrent()">↓ Download PDF</button>
+        <button class="btn-gold" onclick="downloadAll()">↓ Download All</button>
+      </div>
+    </div>
+  </header>
 
-      <!-- Single-Line Exam Title -->
-      <div class="w-full bg-[#d49e24] text-slate-900 rounded-lg py-1 px-2 mt-1.5 shadow-sm text-center">
-        <div id="txtExam" class="font-black text-xs tracking-tight uppercase whitespace-nowrap overflow-hidden text-ellipsis">
-          Syllabus : Half Yearly Examination
+  <section class="hero">
+    <div class="hero-card">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">📚 Official Academic Syllabus</span>
+          <h1>Half Yearly Syllabus Portal</h1>
+          <p>
+            Select a class to view its complete syllabus. The portal reads directly from the
+            <strong>syllabus</strong> sheet, automatically removes empty rows, wraps long text,
+            and creates a clean A4-ready school document.
+          </p>
+          <div class="meta-row">
+            <div class="meta-pill">CBSE • Classes Nursery–XII</div>
+            <div class="meta-pill" id="heroSession">Session: —</div>
+            <div class="meta-pill" id="heroExam">Examination: —</div>
+          </div>
+        </div>
+        <div class="hero-logo">
+          <img src="logo.png" alt="Pinnacle Global School">
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- TABLE SECTION -->
-    <div class="w-full mt-3 border-2 border-[#072448] rounded-xl overflow-hidden shadow-sm">
-      <table class="poster-table">
-        <!-- Table Header -->
-        <thead>
-          <tr class="bg-[#072448] text-white text-xs font-bold uppercase tracking-wider">
-            <th class="col-subject-width py-2 text-center border-r border-[#1a3a63]">
-              <i class="fa-solid fa-book-bookmark text-amber-400 mr-1"></i> Subject
-            </th>
-            <th class="col-syllabus-width py-2 text-center">
-              <i class="fa-solid fa-list-check text-amber-400 mr-1"></i> Syllabus
-            </th>
-          </tr>
-        </thead>
-        <!-- Table Body -->
-        <tbody id="syllabusContainer" class="bg-white">
-          <!-- Injected via JavaScript -->
-        </tbody>
-      </table>
+  <section class="controls">
+    <select id="classSelect" class="selector" onchange="selectClass(this.value)" aria-label="Select class"></select>
+    <button class="btn-primary" onclick="downloadCurrent()">Download Selected Class</button>
+    <button class="btn-light" onclick="window.print()">Print / Save PDF</button>
+    <div class="status" id="status">Loading syllabus…</div>
+  </section>
+
+  <section class="classes" id="classCards"></section>
+
+  <section class="preview-wrap">
+    <div class="preview-head">
+      <div>
+        <h2 id="previewTitle">Syllabus Preview</h2>
+        <p>What you see below is the same layout used for the downloadable PDF.</p>
+      </div>
+      <div id="rowCount" style="font-size:12px;color:#667085"></div>
     </div>
 
-  </div>
+    <div class="paper-shell">
+      <div id="preview">
+        <div class="loading"><div class="spinner"></div><div>Reading syllabus from Google Sheets…</div></div>
+      </div>
+    </div>
+  </section>
 
-  <script>
-    const SPREADSHEET_ID = "1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI";
-    const SHEET_GID = "1915322612"; // Your exact Syllabus tab GID
+  <section class="help">
+    <details>
+      <summary>Google Sheet connection & data structure</summary>
+      <p>
+        Spreadsheet ID: <code>1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI</code>.
+        The portal reads the tab named <code>syllabus</code>. Examination is read from
+        <code>B1</code> and session from <code>F1</code>. Nursery–5th uses pairs
+        <code>A:B, C:D, E:F, G:H, I:J, K:L, M:N, O:P</code>; Classes 6th–12th use
+        <code>A:B</code> through <code>M:N</code>. Only rows containing a subject or syllabus
+        are displayed.
+      </p>
+      <p>
+        <strong>Important:</strong> the Google Sheet must be accessible to the public
+        (or published to the web) for a GitHub Pages site to read it without a Google login.
+        No Google API key is required for the public <code>gviz</code> read used here.
+      </p>
+    </details>
+  </section>
+</div>
 
-    // Subject icon handler: circular 'अ' for Hindi, 'ABC' for English, 'सं' for Sanskrit
-    function getSubjectIconHtml(subjectName) {
-      const s = (subjectName || "").trim().toUpperCase();
-      
-      if (s === 'HINDI') {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] font-bold text-xs shrink-0 bg-slate-50">अ</div>`;
-      }
-      if (s === 'ENGLISH') {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] font-bold text-[9px] shrink-0 bg-slate-50">ABC</div>`;
-      }
-      if (s === 'SANSKRIT') {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] font-bold text-xs shrink-0 bg-slate-50">सं</div>`;
-      }
-      if (s.includes('MATH')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-calculator"></i></div>`;
-      }
-      if (s.includes('SCIENCE')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-flask"></i></div>`;
-      }
-      if (s.includes('S.ST') || s.includes('SOCIAL')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-landmark"></i></div>`;
-      }
-      if (s.includes('COMP')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-laptop"></i></div>`;
-      }
-      if (s.includes('G.K') || s.includes('GK')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-lightbulb"></i></div>`;
-      }
-      if (s.includes('DRAW') || s.includes('ART')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-palette"></i></div>`;
-      }
-      if (s.includes('M.V') || s.includes('VALUE')) {
-        return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-heart"></i></div>`;
-      }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  const CONFIG = {
+    spreadsheetId: "1MMF_UO24i3N7somcryvuz8-2VwIXeF4gcCloNMDRyxI",
+    sheetName: "syllabus",
+    schoolName: "PINNACLE GLOBAL SCHOOL",
+    schoolTagline: "Where Tradition Meets Tomorrow",
+    address: "Near Chola Police Station, Bulandshahr",
+    phones: "7830968000 • 7830969000",
+    logo: "logo.png"
+  };
 
-      return `<div class="w-6 h-6 rounded-full border border-[#072448] flex items-center justify-center text-[#072448] text-[10px] shrink-0 bg-slate-50"><i class="fa-solid fa-book"></i></div>`;
+  const CLASS_NAMES = [
+    "Nursery","LKG","UKG","1st","2nd","3rd","4th","5th",
+    "6th","7th","8th","9th","10th","11th","12th"
+  ];
+
+  let sheetRows = [];
+  let examName = "";
+  let session = "";
+  let selectedClass = "6th";
+  let classData = {};
+
+  function clean(v) {
+    return String(v ?? "").replace(/\r/g,"").trim();
+  }
+
+  // Robust CSV parser: handles commas, quotes, newlines and Unicode.
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = "", quoted = false;
+    for (let i=0; i<text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c === '"') {
+          if (text[i+1] === '"') { field += '"'; i++; }
+          else quoted = false;
+        } else field += c;
+      } else {
+        if (c === '"') quoted = true;
+        else if (c === ',') { row.push(field); field = ""; }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
+        else if (c !== '\r') field += c;
+      }
+    }
+    if (field.length || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  async function fetchCSV() {
+    const url =
+      `https://docs.google.com/spreadsheets/d/${CONFIG.spreadsheetId}/gviz/tq` +
+      `?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.sheetName)}&cachebust=${Date.now()}`;
+
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Google Sheets returned HTTP ${res.status}.`);
+    const text = await res.text();
+
+    if (!text || text.startsWith("<!DOCTYPE") || text.includes("<html")) {
+      throw new Error("The sheet could not be read. Make sure it is shared/published for public viewing.");
+    }
+    return parseCSV(text);
+  }
+
+  function getCell(rows, r, c) {
+    return clean(rows[r]?.[c]);
+  }
+
+  function buildData(rows) {
+    const result = {};
+
+    // Nursery to 5th: rows 4–17 in the sheet => zero-based 3–16.
+    // Pairs: A:B, C:D, ... O:P.
+    for (let pair = 0; pair < 8; pair++) {
+      const col = pair * 2;
+      const cls = getCell(rows, 1, col);
+      if (!cls) continue;
+
+      const entries = [];
+      for (let r = 3; r <= 16; r++) {
+        const subject = getCell(rows, r, col);
+        const syllabus = getCell(rows, r, col + 1);
+        if (subject || syllabus) entries.push({ subject, syllabus });
+      }
+      result[cls] = entries;
     }
 
-    let parsedData = {
-      examName: "Half Yearly Examination",
-      classes: {}
-    };
+    // 6th to 12th: rows 20–33 => zero-based 19–32.
+    // Pairs A:B through M:N.
+    for (let pair = 0; pair < 7; pair++) {
+      const col = pair * 2;
+      const cls = getCell(rows, 17, col);
+      if (!cls) continue;
 
-    // Google Visualization API JSONP Fetch (Bypasses all CORS and CSV publishing issues)
-    function fetchSheetDataDirect() {
-      const gvizUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
-
-      fetch(gvizUrl)
-        .then(res => res.text())
-        .then(rawText => {
-          // Clean the google wrapper: google.visualization.Query.setResponse(...)
-          const jsonString = rawText.substring(rawText.indexOf("{"), rawText.lastIndexOf("}") + 1);
-          const data = JSON.parse(jsonString);
-          processGvizData(data.table);
-        })
-        .catch(err => {
-          console.error("Direct fetch error:", err);
-          renderPlaceholder();
-        });
+      const entries = [];
+      for (let r = 19; r <= 32; r++) {
+        const subject = getCell(rows, r, col);
+        const syllabus = getCell(rows, r, col + 1);
+        if (subject || syllabus) entries.push({ subject, syllabus });
+      }
+      result[cls] = entries;
     }
 
-    function processGvizData(table) {
-      if (!table || !table.rows || table.rows.length === 0) return;
+    return result;
+  }
 
-      // Extract Exam Name from Cell B1 (Row 0, Col 1)
-      if (table.rows[0] && table.rows[0].c && table.rows[0].c[1]) {
-        parsedData.examName = table.rows[0].c[1].v || "Half Yearly Examination";
-      }
+  function initials(subject) {
+    const s = clean(subject);
+    if (!s) return "•";
+    const words = s.replace(/[^\p{L}\p{N}\s]/gu," ").split(/\s+/).filter(Boolean);
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return s.slice(0,2).toUpperCase();
+  }
 
-      parsedData.classes = {};
+  function escapeHTML(s) {
+    return String(s ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
 
-      // Helper function to safely read cell value
-      const getVal = (r, c) => {
-        if (table.rows[r] && table.rows[r].c && table.rows[r].c[c]) {
-          return table.rows[r].c[c].v != null ? String(table.rows[r].c[c].v).trim() : "";
-        }
-        return "";
-      };
+  function renderPage(cls) {
+    const rows = classData[cls] || [];
 
-      // Band 1: Nursery to 5th (Columns A to P -> 0 to 15, Class header Row 2 -> index 1, Data Rows 4 to 17 -> index 3 to 16)
-      for (let col = 0; col <= 15; col += 2) {
-        let className = getVal(1, col + 1);
-        if (!className) continue;
-
-        let subjectList = [];
-        for (let r = 3; r <= 16 && r < table.rows.length; r++) {
-          let subj = getVal(r, col);
-          let syl = getVal(r, col + 1);
-          if (subj !== "") {
-            subjectList.push({ subject: subj, syllabus: syl });
-          }
-        }
-        parsedData.classes[className] = subjectList;
-      }
-
-      // Band 2: 6th to 12th (Columns A to N -> 0 to 13, Class header Row 18 -> index 17, Data Rows 20 to 33 -> index 19 to 32)
-      if (table.rows.length > 18) {
-        for (let col = 0; col <= 13; col += 2) {
-          let className = getVal(17, col + 1);
-          if (!className) continue;
-
-          let subjectList = [];
-          for (let r = 19; r <= 32 && r < table.rows.length; r++) {
-            let subj = getVal(r, col);
-            let syl = getVal(r, col + 1);
-            if (subj !== "") {
-              subjectList.push({ subject: subj, syllabus: syl });
-            }
-          }
-          parsedData.classes[className] = subjectList;
-        }
-      }
-
-      renderPoster();
-    }
-
-    function renderPoster() {
-      const cls = document.getElementById("classDropdown").value;
-      document.getElementById("txtClass").innerText = "Class : " + cls;
-      
-      const examStr = "Syllabus : " + (parsedData.examName || "Half Yearly Examination");
-      const examElem = document.getElementById("txtExam");
-      examElem.innerText = examStr;
-
-      const container = document.getElementById("syllabusContainer");
-      container.innerHTML = "";
-
-      // Match class case-insensitively or with suffixes (e.g. "7th" vs "7")
-      let subjects = parsedData.classes[cls];
-      if (!subjects) {
-        const clean = cls.replace(/\D/g, '');
-        const key = Object.keys(parsedData.classes).find(k => 
-          k.toLowerCase() === cls.toLowerCase() || (clean && k.replace(/\D/g, '') === clean)
-        );
-        if (key) subjects = parsedData.classes[key];
-      }
-
-      if (!subjects || subjects.length === 0) {
-        container.innerHTML = `
+    const rowsHTML = rows.length
+      ? rows.map((item, i) => `
           <tr>
-            <td colspan="2" class="p-4 text-center text-slate-400 font-medium text-xs">
-              No entries found in Google Sheet for ${cls}.
-            </td>
-          </tr>`;
-        return;
-      }
-
-      subjects.forEach(item => {
-        const iconHtml = getSubjectIconHtml(item.subject);
-
-        // Turn linebreaks into bullet points
-        const bullets = item.syllabus
-          .split('\n')
-          .filter(l => l.trim() !== '')
-          .map(l => `<div class="leading-tight mb-0.5">${l.startsWith('•') ? l : '• ' + l}</div>`)
-          .join('');
-
-        const row = `
-          <tr class="hover:bg-slate-50">
-            <!-- Subject Cell: Guaranteed width, icon + full name visible in one line -->
-            <td class="col-subject-width p-2 align-middle bg-slate-50/50">
-              <div class="flex items-center gap-1.5 overflow-hidden">
-                ${iconHtml}
-                <span class="font-extrabold text-[#072448] text-xs uppercase whitespace-nowrap overflow-hidden text-ellipsis">
-                  ${item.subject}
-                </span>
+            <td>
+              <div class="subject-cell">
+                <span class="subject-dot">${escapeHTML(initials(item.subject))}</span>
+                <span>${escapeHTML(item.subject || "—")}</span>
               </div>
             </td>
-            <!-- Syllabus Cell: Expands naturally to fit all lines -->
-            <td class="col-syllabus-width p-2 align-middle text-[11px] font-semibold text-slate-800">
-              ${bullets || '—'}
-            </td>
+            <td>${escapeHTML(item.syllabus || "—")}</td>
           </tr>
-        `;
-        container.innerHTML += row;
-      });
+        `).join("")
+      : `<tr><td colspan="2"><div class="empty-note">No syllabus entries have been entered for this class yet.</div></td></tr>`;
+
+    return `
+      <div class="syllabus-page" id="printPage">
+        <div class="page-frame"></div>
+        <div class="page-topline"></div>
+
+        <div class="school-head">
+          <img class="school-logo" src="${CONFIG.logo}" alt="School logo">
+          <div class="school-center">
+            <div class="school-name">${CONFIG.schoolName}</div>
+            <div class="tagline">${CONFIG.schoolTagline}</div>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="exam-title">${escapeHTML(examName || "EXAMINATION")} • SYLLABUS</div>
+        <div class="gold-rule"></div>
+
+        <div class="info-strip">
+          <div class="info-box">
+            <div class="info-label">Academic Session</div>
+            <div class="info-value">${escapeHTML(session || "—")}</div>
+          </div>
+          <div class="info-box">
+            <div class="info-label">Class</div>
+            <div class="info-value">${escapeHTML(cls)}</div>
+          </div>
+          <div class="info-box">
+            <div class="info-label">Total Subjects / Entries</div>
+            <div class="info-value">${rows.length}</div>
+          </div>
+        </div>
+
+        <div class="table-title">
+          <span>Subject-wise Syllabus</span>
+          <span>${escapeHTML(cls)}</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Syllabus / Portion</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHTML}</tbody>
+        </table>
+
+        <div class="page-footer">
+          <div><strong>${CONFIG.schoolName}</strong> • ${CONFIG.address} • ${CONFIG.phones}</div>
+          <div class="page-number">Official Syllabus</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCards() {
+    const wrap = document.getElementById("classCards");
+    const select = document.getElementById("classSelect");
+
+    const available = CLASS_NAMES.filter(c => Object.prototype.hasOwnProperty.call(classData, c));
+    const ordered = available.length ? available : CLASS_NAMES;
+
+    select.innerHTML = ordered.map(c =>
+      `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`
+    ).join("");
+
+    if (!ordered.includes(selectedClass)) selectedClass = ordered[0];
+    select.value = selectedClass;
+
+    wrap.innerHTML = ordered.map(cls => {
+      const n = (classData[cls] || []).length;
+      return `
+        <div class="class-card ${cls===selectedClass ? "active":""}" onclick="selectClass('${cls.replace(/'/g,"\\'")}')">
+          <small>CLASS</small>
+          <strong>${escapeHTML(cls)}</strong>
+          <span>${n} syllabus ${n===1 ? "entry":"entries"}</span>
+        </div>`;
+    }).join("");
+  }
+
+  function selectClass(cls) {
+    selectedClass = cls;
+    document.getElementById("classSelect").value = cls;
+    document.getElementById("previewTitle").textContent = `${cls} — Syllabus Preview`;
+    document.getElementById("rowCount").textContent = `${(classData[cls] || []).length} entries`;
+    document.getElementById("preview").innerHTML = renderPage(cls);
+    document.querySelectorAll(".class-card").forEach(card => {
+      card.classList.toggle("active", card.querySelector("strong")?.textContent === cls);
+    });
+    window.scrollTo({top: document.querySelector(".preview-wrap").offsetTop - 85, behavior:"smooth"});
+  }
+
+  async function loadSheet() {
+    const status = document.getElementById("status");
+    const preview = document.getElementById("preview");
+    status.textContent = "Refreshing…";
+    preview.innerHTML = `<div class="loading"><div class="spinner"></div><div>Reading syllabus from Google Sheets…</div></div>`;
+
+    try {
+      sheetRows = await fetchCSV();
+
+      examName = getCell(sheetRows, 0, 1);
+      session = getCell(sheetRows, 0, 5);
+      classData = buildData(sheetRows);
+
+      document.getElementById("heroSession").textContent = `Session: ${session || "—"}`;
+      document.getElementById("heroExam").textContent = `Examination: ${examName || "—"}`;
+      document.title = `${CONFIG.schoolName} — ${examName || "Syllabus"} ${session || ""}`;
+
+      const available = CLASS_NAMES.filter(c => classData[c] !== undefined);
+      status.textContent = `Updated just now • ${available.length} classes found`;
+      renderCards();
+      selectClass(selectedClass);
+    } catch (err) {
+      console.error(err);
+      status.textContent = "Unable to load";
+      preview.innerHTML = `
+        <div class="error">
+          <strong>Could not load the Google Sheet.</strong><br><br>
+          ${escapeHTML(err.message)}
+          <br><br>
+          <strong>Check these two things:</strong>
+          <ol>
+            <li>Open the Google Sheet → <strong>Share</strong> → make it accessible to anyone who needs to view the syllabus, or use <strong>Publish to the web</strong>.</li>
+            <li>Confirm the tab is named exactly <strong>syllabus</strong>.</li>
+          </ol>
+          Then click <strong>Refresh</strong>.
+        </div>`;
+    }
+  }
+
+  async function downloadElement(element, filename) {
+    if (!window.html2pdf) {
+      alert("PDF library has not loaded. Please check your internet connection and try again.");
+      return;
     }
 
-    function renderPlaceholder() {
-      parsedData.classes["7th"] = [
-        { subject: "English", syllabus: "Chapter 1 to 5 Reader\nGrammar: Nouns, Verbs, Tenses" },
-        { subject: "Hindi", syllabus: "पाठ 1 से 6\nव्याकरण: संधि, समास" },
-        { subject: "Maths", syllabus: "Ch 1: Integers\nCh 2: Fractions & Decimals" }
-      ];
-      renderPoster();
-    }
-
-    function downloadPNG() {
-      const node = document.getElementById("poster-area");
-      const cls = document.getElementById("classDropdown").value;
-
-      html2canvas(node, {
-        scale: 3,
+    const options = {
+      margin: 0,
+      filename,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
         useCORS: true,
         backgroundColor: "#ffffff",
-        scrollX: 0,
-        scrollY: 0
-      }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `Syllabus_${cls}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-      });
-    }
+        logging: false
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      pagebreak: { mode: ["css", "legacy"] }
+    };
 
-    window.onload = fetchSheetDataDirect;
-  </script>
+    await html2pdf().set(options).from(element).save();
+  }
+
+  async function downloadCurrent() {
+    const page = document.getElementById("printPage");
+    if (!page) return alert("Please wait for the syllabus to load.");
+    const safeExam = (examName || "Syllabus").replace(/[^\w\u0900-\u097F-]+/g,"-");
+    await downloadElement(page, `${CONFIG.schoolName.replace(/\s+/g,"-")}-${selectedClass}-${safeExam}.pdf`);
+  }
+
+  async function downloadAll() {
+    const classes = CLASS_NAMES.filter(c => classData[c] && classData[c].length);
+    if (!classes.length) return alert("No syllabus data is available.");
+
+    const holder = document.createElement("div");
+    holder.style.position = "fixed";
+    holder.style.left = "-100000px";
+    holder.style.top = "0";
+    holder.style.width = "210mm";
+    holder.style.background = "#fff";
+    holder.innerHTML = classes.map((c,i) => {
+      const page = renderPage(c);
+      return i === 0 ? page : page.replace('class="syllabus-page"', 'class="syllabus-page" style="page-break-before:always"');
+    }).join("");
+
+    document.body.appendChild(holder);
+    try {
+      await downloadElement(holder, `${CONFIG.schoolName.replace(/\s+/g,"-")}-${(examName || "Syllabus").replace(/[^\w\u0900-\u097F-]+/g,"-")}-All-Classes.pdf`);
+    } finally {
+      holder.remove();
+    }
+  }
+
+  loadSheet();
+</script>
 </body>
 </html>
