@@ -661,20 +661,41 @@ function parseSyllabus() {
                 break;
             }
         }
-
-        // If not detected, default to row index 49 (Sheet Row 50)
         if (examRow === -1) examRow = 49;
 
-        // Set Exam Name from Column B of this row
         const sylExam = getVal(examRow, 1);
         examNameSyllabus = sylExam || "Examination";
 
+        // 2. Locate Row 51 (Nursery Header)
+        let nurseryHeaderRow = -1;
+        for (let r = examRow; r < examRow + 4; r++) {
+            if (r >= matrix.length) break;
+            const c0 = getVal(r, 0).toLowerCase();
+            const c1 = getVal(r, 1).toLowerCase();
+            if (c1.includes("nursery") || c0.includes("class")) {
+                nurseryHeaderRow = r;
+                break;
+            }
+        }
+        if (nurseryHeaderRow === -1) nurseryHeaderRow = examRow + 1;
+
+        // 3. Locate Row 67 (6th Header) directly
+        let sixthHeaderRow = -1;
+        for (let r = nurseryHeaderRow + 10; r < matrix.length; r++) {
+            const c0 = getVal(r, 0).toLowerCase();
+            const c1 = getVal(r, 1).toLowerCase();
+            if (c1.includes("6th") || (c0.includes("class") && c1.includes("6th"))) {
+                sixthHeaderRow = r;
+                break;
+            }
+        }
+        if (sixthHeaderRow === -1) sixthHeaderRow = nurseryHeaderRow + 16;
+
         // -------------------------------------------------------------
-        // BLOCK 1: Nursery to 5th (Sheet Rows 53 to 66)
-        // Relative to examRow: starts at +3 (Row 53), ends at +16 (Row 66)
+        // BLOCK 1: Nursery to 5th (Rows 53 to 66)
         // -------------------------------------------------------------
-        const b1Start = examRow + 3;
-        const b1End = examRow + 16;
+        const b1Start = nurseryHeaderRow + 2; 
+        const b1End = sixthHeaderRow - 1; // Strict cutoff before Row 67
 
         block1.forEach(item => {
             parsedSyllabusData[item.name] = [];
@@ -685,10 +706,9 @@ function parseSyllabus() {
                 const syllabus = getVal(r, item.sylCol).trim();
                 const subLower = subject.toLowerCase();
 
-                // If row touches the Class 6th header (Row 67), stop
-                if (subLower === "class" || subLower === "subject") break;
+                // Skip any stray header row
+                if (subLower === "class" || subLower === "subject") continue;
 
-                // Only add if there is actual written text
                 if (subject !== "" || syllabus !== "") {
                     parsedSyllabusData[item.name].push({
                         subject: subject,
@@ -699,34 +719,33 @@ function parseSyllabus() {
         });
 
         // -------------------------------------------------------------
-        // BLOCK 2: 6th to 12th (Sheet Rows 69 to 82)
-        // Relative to examRow: starts at +19 (Row 69), strictly ends at +32 (Row 82)
+        // BLOCK 2: 6th to 12th (Rows 69 to 82)
+        // Starts 2 rows below sixthHeaderRow (skipping Subject/Syllabus header)
+        // Strictly terminates after 14 rows (Row 82)
         // -------------------------------------------------------------
-        const b2Start = examRow + 19;
-        const b2End = examRow + 32; // Row 82 ONLY!
+        const b2Start = sixthHeaderRow + 2; // Row 69
+        const b2End = b2Start + 13;         // Exactly 14 data rows: Row 82
 
         block2.forEach(item => {
             parsedSyllabusData[item.name] = [];
             for (let r = b2Start; r <= b2End; r++) {
-                // HARD STOP: Never read Row 83 or beyond
-                if (r > b2End || r >= matrix.length) break;
+                if (r >= matrix.length) break;
 
                 const subject = getVal(r, item.subCol).trim();
                 const syllabus = getVal(r, item.sylCol).trim();
                 const subLower = subject.toLowerCase();
 
-                // Explicit stop if it hits "END" (Row 83) or "Homework" (Row 86)
-                if (
-                    subLower === "end" ||
-                    subLower === "homework" ||
-                    subLower === "class" ||
-                    subLower === "subject" ||
-                    subLower.startsWith("date")
-                ) {
+                // Stop immediately if it reaches the footer ("END" at Row 83, or "Homework")
+                if (subLower === "end" || subLower === "homework" || subLower.startsWith("date")) {
                     break;
                 }
 
-                // Only add if there is actual written text
+                // If by any chance it encounters "class" or "subject", SKIP it rather than breaking the loop
+                if (subLower === "class" || subLower === "subject" || subLower === "syllabus") {
+                    continue;
+                }
+
+                // Add entry if there is any subject or syllabus text
                 if (subject !== "" || syllabus !== "") {
                     parsedSyllabusData[item.name].push({
                         subject: subject,
@@ -735,7 +754,9 @@ function parseSyllabus() {
                 }
             }
         });
-    }    
+    }
+
+    
     function parseSyllabusGrid(headerRowIdx, startRowIdx, endRowIdx, maxCols, defaultNames) {
         let classIndex = 0;
         for (let c = 0; c < maxCols; c += 2) {
