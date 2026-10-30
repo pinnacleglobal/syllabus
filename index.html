@@ -502,121 +502,133 @@
         }
 
         // Syllabus Parser
-        function parseSyllabus() {
-            parsedSyllabusData = {};
+        // Exact 14-Row Hard-Separation Syllabus Parser
+    function parseSyllabus() {
+        parsedSyllabusData = {};
 
-            const block1 = [
-                { name: "Nursery", subCol: 0, sylCol: 1 },  // A, B
-                { name: "LKG",     subCol: 2, sylCol: 3 },  // C, D
-                { name: "UKG",     subCol: 4, sylCol: 5 },  // E, F
-                { name: "1st",     subCol: 6, sylCol: 7 },  // G, H
-                { name: "2nd",     subCol: 8, sylCol: 9 },  // I, J
-                { name: "3rd",     subCol: 10, sylCol: 11 },// K, L
-                { name: "4th",     subCol: 12, sylCol: 13 },// M, N
-                { name: "5th",     subCol: 14, sylCol: 15 } // O, P
-            ];
+        const block1 = [
+            { name: "Nursery", subCol: 0, sylCol: 1 },  // A, B
+            { name: "LKG",     subCol: 2, sylCol: 3 },  // C, D
+            { name: "UKG",     subCol: 4, sylCol: 5 },  // E, F
+            { name: "1st",     subCol: 6, sylCol: 7 },  // G, H
+            { name: "2nd",     subCol: 8, sylCol: 9 },  // I, J
+            { name: "3rd",     subCol: 10, sylCol: 11 },// K, L
+            { name: "4th",     subCol: 12, sylCol: 13 },// M, N
+            { name: "5th",     subCol: 14, sylCol: 15 } // O, P
+        ];
 
-            const block2 = [
-                { name: "6th",  subCol: 0, sylCol: 1 },  // A, B
-                { name: "7th",  subCol: 2, sylCol: 3 },  // C, D
-                { name: "8th",  subCol: 4, sylCol: 5 },  // E, F
-                { name: "9th",  subCol: 6, sylCol: 7 },  // G, H
-                { name: "10th", subCol: 8, sylCol: 9 },  // I, J
-                { name: "11th", subCol: 10, sylCol: 11 },// K, L
-                { name: "12th", subCol: 12, sylCol: 13 } // M, N
-            ];
+        const block2 = [
+            { name: "6th",  subCol: 0, sylCol: 1 },  // A, B
+            { name: "7th",  subCol: 2, sylCol: 3 },  // C, D
+            { name: "8th",  subCol: 4, sylCol: 5 },  // E, F
+            { name: "9th",  subCol: 6, sylCol: 7 },  // G, H
+            { name: "10th", subCol: 8, sylCol: 9 },  // I, J
+            { name: "11th", subCol: 10, sylCol: 11 },// K, L
+            { name: "12th", subCol: 12, sylCol: 13 } // M, N
+        ];
 
-            let examRow = -1;
-            for (let r = 0; r < matrix.length; r++) {
-                const val = getVal(r, 0).toLowerCase();
-                if (val.includes("test") || val.includes("exam name")) {
-                    examRow = r;
-                    break;
-                }
+        // 1. Locate Row 50 ("Test/Exam Name")
+        let examRow = -1;
+        for (let r = 0; r < matrix.length; r++) {
+            const val = getVal(r, 0).toLowerCase();
+            if (val.includes("test") || val.includes("exam name")) {
+                examRow = r;
+                break;
             }
-            if (examRow === -1) examRow = 49;
-
-            const sylExam = getVal(examRow, 1);
-            examNameSyllabus = sylExam || "Examination";
-
-            let nurseryHeaderRow = -1;
-            for (let r = examRow; r < examRow + 4; r++) {
-                if (r >= matrix.length) break;
-                const c0 = getVal(r, 0).toLowerCase();
-                const c1 = getVal(r, 1).toLowerCase();
-                if (c1.includes("nursery") || c0.includes("class")) {
-                    nurseryHeaderRow = r;
-                    break;
-                }
-            }
-            if (nurseryHeaderRow === -1) nurseryHeaderRow = examRow + 1;
-
-            let sixthHeaderRow = -1;
-            for (let r = nurseryHeaderRow + 10; r < matrix.length; r++) {
-                const c0 = getVal(r, 0).toLowerCase();
-                const c1 = getVal(r, 1).toLowerCase();
-                if (c1.includes("6th") || (c0.includes("class") && c1.includes("6th"))) {
-                    sixthHeaderRow = r;
-                    break;
-                }
-            }
-            if (sixthHeaderRow === -1) sixthHeaderRow = nurseryHeaderRow + 16;
-
-            // Block 1: Nursery to 5th
-            const b1Start = nurseryHeaderRow + 2; 
-            const b1End = sixthHeaderRow - 1;
-
-            block1.forEach(item => {
-                parsedSyllabusData[item.name] = [];
-                for (let r = b1Start; r <= b1End; r++) {
-                    if (r >= matrix.length) break;
-
-                    const subject = getVal(r, item.subCol).trim();
-                    const syllabus = getVal(r, item.sylCol).trim();
-                    const subLower = subject.toLowerCase();
-
-                    if (subLower === "class" || subLower === "subject") continue;
-
-                    if (subject !== "" || syllabus !== "") {
-                        parsedSyllabusData[item.name].push({
-                            subject: subject,
-                            syllabus: syllabus
-                        });
-                    }
-                }
-            });
-
-            // Block 2: 6th to 12th
-            const b2Start = sixthHeaderRow + 2;
-            const b2End = b2Start + 13;
-
-            block2.forEach(item => {
-                parsedSyllabusData[item.name] = [];
-                for (let r = b2Start; r <= b2End; r++) {
-                    if (r >= matrix.length) break;
-
-                    const subject = getVal(r, item.subCol).trim();
-                    const syllabus = getVal(r, item.sylCol).trim();
-                    const subLower = subject.toLowerCase();
-
-                    if (subLower === "end" || subLower === "homework" || subLower.startsWith("date")) {
-                        break;
-                    }
-
-                    if (subLower === "class" || subLower === "subject" || subLower === "syllabus") {
-                        continue;
-                    }
-
-                    if (subject !== "" || syllabus !== "") {
-                        parsedSyllabusData[item.name].push({
-                            subject: subject,
-                            syllabus: syllabus
-                        });
-                    }
-                }
-            });
         }
+        if (examRow === -1) examRow = 49; // Row 50
 
+        const sylExam = getVal(examRow, 1);
+        examNameSyllabus = sylExam || "Examination";
+
+        // 2. Locate Row 51 (Nursery Header)
+        let nurseryHeaderRow = -1;
+        for (let r = examRow; r < examRow + 4; r++) {
+            if (r >= matrix.length) break;
+            const c0 = getVal(r, 0).toLowerCase();
+            const c1 = getVal(r, 1).toLowerCase();
+            if (c1.includes("nursery") || c0.includes("class")) {
+                nurseryHeaderRow = r;
+                break;
+            }
+        }
+        if (nurseryHeaderRow === -1) nurseryHeaderRow = examRow + 1; // Row 51
+
+        // 3. Locate Row 67 (6th Header)
+        let sixthHeaderRow = -1;
+        for (let r = nurseryHeaderRow + 10; r < matrix.length; r++) {
+            const c0 = getVal(r, 0).toLowerCase();
+            const c1 = getVal(r, 1).toLowerCase();
+            if (c1.includes("6th") || (c0.includes("class") && c1.includes("6th"))) {
+                sixthHeaderRow = r;
+                break;
+            }
+        }
+        // If not found via text, Row 67 is exactly 16 rows below Row 51
+        if (sixthHeaderRow === -1) sixthHeaderRow = nurseryHeaderRow + 16; // Row 67
+
+        // -------------------------------------------------------------------
+        // BLOCK 1: Nursery to 5th (Sheet Rows 53 to 66)
+        // Exactly 14 data rows. Hard-stopped at nurseryHeaderRow + 15 (Row 66).
+        // -------------------------------------------------------------------
+        const b1Start = nurseryHeaderRow + 2; // Row 53
+        const b1End = nurseryHeaderRow + 15;  // Row 66
+
+        block1.forEach(item => {
+            parsedSyllabusData[item.name] = [];
+            for (let r = b1Start; r <= b1End; r++) {
+                if (r >= matrix.length) break;
+
+                const subject = getVal(r, item.subCol).trim();
+                const syllabus = getVal(r, item.sylCol).trim();
+                const subLower = subject.toLowerCase();
+
+                // Skip header rows if encountered
+                if (subLower === "class" || subLower === "subject" || subLower === "syllabus") continue;
+
+                if (subject !== "" || syllabus !== "") {
+                    parsedSyllabusData[item.name].push({
+                        subject: subject,
+                        syllabus: syllabus
+                    });
+                }
+            }
+        });
+
+        // -------------------------------------------------------------------
+        // BLOCK 2: 6th to 12th (Sheet Rows 69 to 82)
+        // Exactly 14 data rows. Starts at Row 69, strictly ends at Row 82.
+        // -------------------------------------------------------------------
+        const b2Start = sixthHeaderRow + 2; // Row 69
+        const b2End = b2Start + 13;         // Row 82
+
+        block2.forEach(item => {
+            parsedSyllabusData[item.name] = [];
+            for (let r = b2Start; r <= b2End; r++) {
+                if (r >= matrix.length) break;
+
+                const subject = getVal(r, item.subCol).trim();
+                const syllabus = getVal(r, item.sylCol).trim();
+                const subLower = subject.toLowerCase();
+
+                // Stop immediately if reaching Row 83 ("END") or "Homework"
+                if (subLower === "end" || subLower === "homework" || subLower.startsWith("date")) {
+                    break;
+                }
+
+                if (subLower === "class" || subLower === "subject" || subLower === "syllabus") {
+                    continue;
+                }
+
+                if (subject !== "" || syllabus !== "") {
+                    parsedSyllabusData[item.name].push({
+                        subject: subject,
+                        syllabus: syllabus
+                    });
+                }
+            }
+        });
+    }
         function populateDropdown() {
             const select = document.getElementById('classSelect');
             const previousVal = select.value;
