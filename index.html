@@ -447,59 +447,86 @@
             }
         }
 
-        // Date Sheet Parser
-        function parseDateSheet() {
-            parsedDatesheetData = {};
+      // Date Sheet Parser with strict Practical Dates cutoff
+    function parseDateSheet() {
+        parsedDatesheetData = {};
 
-            let headerRowIdx = 1;
-            for (let r = 0; r <= 3; r++) {
-                for (let c = 1; c <= 15; c++) {
-                    const val = getVal(r, c).toLowerCase();
-                    if (val.includes("nur") || val.includes("1st") || val.includes("6th") || val.includes("lkg")) {
-                        headerRowIdx = r;
-                        break;
-                    }
-                }
-            }
-
-            const classMap = {};
+        // Find class header row around row 2 (indices 0 to 3)
+        let headerRowIdx = 1;
+        for (let r = 0; r <= 3; r++) {
             for (let c = 1; c <= 15; c++) {
-                let cls = getVal(headerRowIdx, c);
-                if (cls) {
-                    cls = cleanClassName(cls);
-                    classMap[c] = cls;
-                    if (!parsedDatesheetData[cls]) {
-                        parsedDatesheetData[cls] = { minor: [], major: [] };
-                    }
-                }
-            }
-
-            // Minor exams: Rows 4 & 5 (indices 3 & 4)
-            for (let r = 3; r <= 4; r++) {
-                const date = getVal(r, 0).trim();
-                if (!date) continue;
-                for (let c in classMap) {
-                    const cls = classMap[c];
-                    const subject = getVal(r, parseInt(c)).trim();
-                    if (subject !== "") {
-                        parsedDatesheetData[cls].minor.push({ date, subject });
-                    }
-                }
-            }
-
-            // Major exams / PT exams: Rows 7 to 12 (indices 6 to 11)
-            for (let r = 6; r <= 11; r++) {
-                const date = getVal(r, 0).trim();
-                if (!date) continue;
-                for (let c in classMap) {
-                    const cls = classMap[c];
-                    const subject = getVal(r, parseInt(c)).trim();
-                    if (subject !== "") {
-                        parsedDatesheetData[cls].major.push({ date, subject });
-                    }
+                const val = getVal(r, c).toLowerCase();
+                if (val.includes("nur") || val.includes("1st") || val.includes("6th") || val.includes("lkg")) {
+                    headerRowIdx = r;
+                    break;
                 }
             }
         }
+
+        const classMap = {};
+        for (let c = 1; c <= 15; c++) {
+            let cls = getVal(headerRowIdx, c);
+            if (cls) {
+                cls = cleanClassName(cls);
+                classMap[c] = cls;
+                if (!parsedDatesheetData[cls]) {
+                    parsedDatesheetData[cls] = { minor: [], major: [] };
+                }
+            }
+        }
+
+        // Helper to check if text is an actual date (e.g. contains numbers/slashes like 16/11/2026)
+        function isValidDate(str) {
+            if (!str) return false;
+            const lower = str.toLowerCase().trim();
+            if (
+                lower.includes("practical") || 
+                lower.includes("major") || 
+                lower.includes("minor") || 
+                lower.includes("dates") || 
+                lower.includes("exam")
+            ) {
+                return false;
+            }
+            // Must contain at least one digit (0-9) to be a date
+            return /\d/.test(str);
+        }
+
+        // 1. Minor Exams (Rows 4 & 5 -> Indices 3 & 4)
+        for (let r = 3; r <= 4; r++) {
+            const date = getVal(r, 0).trim();
+            if (!isValidDate(date)) continue;
+
+            for (let c in classMap) {
+                const cls = classMap[c];
+                const subject = getVal(r, parseInt(c)).trim();
+                if (subject !== "") {
+                    parsedDatesheetData[cls].minor.push({ date, subject });
+                }
+            }
+        }
+
+        // 2. Major Exams / PT Exams (Rows 7 to 12 -> Indices 6 to 11)
+        for (let r = 6; r <= 11; r++) {
+            const date = getVal(r, 0).trim();
+
+            // STOP immediately if we hit Practical Dates or any footer section
+            if (date.toLowerCase().includes("practical") || date.toLowerCase().includes("session")) {
+                break;
+            }
+
+            // Only accept valid exam dates
+            if (!isValidDate(date)) continue;
+
+            for (let c in classMap) {
+                const cls = classMap[c];
+                const subject = getVal(r, parseInt(c)).trim();
+                if (subject !== "") {
+                    parsedDatesheetData[cls].major.push({ date, subject });
+                }
+            }
+        }
+    }
 
         // Syllabus Parser
         // Exact 14-Row Hard-Separation Syllabus Parser
